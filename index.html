@@ -688,8 +688,7 @@ const PANELS = {
 };
 
 const END = {
-  title:['Thank', 'you'],
-  note:'Digital Card Experience Revamp — questions, and what we take on next.'
+  title:['Thank', 'you']
 };
 
 /* ====================================================================== */
@@ -882,7 +881,8 @@ function panelCover(){
 function panelEnd(){
   return `<div class="panel endslide" data-nm="End">
     <h2>${esc(END.title[0])} <em>${esc(END.title[1])}</em></h2>
-    <p>${esc(END.note)}</p><span class="ykey"></span></div>`;
+    ${END.note ? `<p>${esc(END.note)}</p>` : ''}
+    <span class="ykey"></span></div>`;
 }
 
 /* ====================================================================== */
