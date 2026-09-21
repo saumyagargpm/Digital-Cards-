@@ -248,6 +248,10 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .shead .stack::before{content:"";position:absolute;left:0;top:3px;bottom:3px;
   width:3px;border-radius:99px;background:var(--y)}
 
+/* the phase/date sits above the title, small and quiet — the title is still
+   what the eye lands on first */
+.shead .shk{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--y);opacity:.85}
 .shead h2{font-size:clamp(23px,2.8vw,40px);font-weight:800;letter-spacing:-.035em;
   line-height:1;color:var(--tx)}
 /* the subtitle is a sentence, not a label — it reads as sans text rather than
@@ -460,9 +464,11 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .chplot .ylab{text-anchor:end} .chplot .xlab{text-anchor:middle}
 .chplot .bandbox.red{fill:rgba(242,118,107,.13);stroke:rgba(242,118,107,.42)}
 .chplot .bandbox.green{fill:rgba(87,217,163,.12);stroke:rgba(87,217,163,.42)}
+.chplot .bandbox.gold{fill:rgba(216,169,62,.14);stroke:rgba(216,169,62,.48)}
 .chplot .bandlab{font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;
   text-transform:uppercase;text-anchor:middle}
 .chplot .bandlab.red{fill:var(--coral)} .chplot .bandlab.green{fill:var(--live)}
+.chplot .bandlab.gold{fill:var(--gold)}
 .chplot .peak{font-family:var(--mono);font-size:9px;fill:var(--tx2);text-anchor:middle}
 .chcap{flex:none;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
   font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3)}
@@ -470,6 +476,7 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
   vertical-align:-1px}
 .chcap .red i{background:rgba(242,118,107,.45);outline:1px solid rgba(242,118,107,.6)}
 .chcap .green i{background:rgba(87,217,163,.45);outline:1px solid rgba(87,217,163,.6)}
+.chcap .gold i{background:rgba(216,169,62,.45);outline:1px solid rgba(216,169,62,.6)}
 .chcap .line i{background:none;border-top:2px solid var(--coral);height:0;border-radius:0}
 
 /* ---- a second series on its own right-hand axis ---- */
@@ -628,7 +635,7 @@ const PANELS = {
     /* the whole pre-2025 argument is that the GMV and the chargeback rate are
        the same story, so they share one plot: bars on the left axis, rate on
        the right. The bars are greyed because that GMV was never really ours. */
-    { title:'Pre-2025 · Fraud Cleanup', tagline:'The GMV and the risk behind it were the same curve',
+    { kicker:'Phase 1 · Pre-2025', title:'Fraud Cleanup', tagline:'The GMV and the risk behind it were the same curve',
       layout:'chart', unit:'Bars: AED monthly GMV · Line: chargebacks, % of GMV',
       series:[
         { m:'Nov 23', v:1422.6, pre:true }, { m:'Dec 23', v:741.4,  pre:true },
@@ -657,7 +664,7 @@ const PANELS = {
 
     /* post-2025 is a step change, not a slope — two run-rate lines make the
        shift legible, and the funnel says which product change caused it */
-    { title:'Post-2025 · Growth and the Revamp', tagline:'A new baseline, then the buying-flow rollout',
+    { kicker:'Phase 2 · Post-2025', title:'Growth and the Revamp', tagline:'A new baseline, then the buying-flow rollout',
       layout:'chart', unit:'AED · monthly GMV',
       series:[
         { m:'Jan 25', v:328.1 }, { m:'Feb 25', v:270.9 }, { m:'Mar 25', v:334.0 },
@@ -672,8 +679,12 @@ const PANELS = {
         { from:0, to:4,  v:300.6, lab:'301K' },
         { from:5, to:19, v:608.4, lab:'608K' }
       ],
-      bands:[ { from:17, to:19, kind:'green', lab:'New flow at 100% of App' } ],
+      bands:[
+        { from:5,  to:5,  kind:'gold',  lab:'Assortment ~2x → uplift' },
+        { from:17, to:19, kind:'green', lab:'New flow at 100% of App' }
+      ],
       legend:[
+        { kind:'gold',  lab:"Jun'25 · assortment nearly doubled" },
         { kind:'green', lab:"Jun'26 · App-wide rollout" }
       ],
       funnel:{ t:'A/B lift · test vs control', rows:[
@@ -683,7 +694,7 @@ const PANELS = {
         { k:'Brands / order',v:0 }
       ] },
       metrics:[
-        { k:'Baseline shift',   v:'2.0x',  d:"Jan–May'25 301K → Jun'25 onward 608K", dir:'up' },
+        { k:'Baseline shift',   v:'2.0x',  d:"Jan–May'25 301K → Jun'25 onward 608K, on ~2x assortment", dir:'up' },
         { k:'A/B test GMV lift',v:'+23%',  d:'AE & SA · 50/50 split, App only', dir:'up' },
         { k:'Rollout reached',  v:'100%',  d:"All App users since mid-Jun'26", dir:'up' },
         { k:'Since rollout',    v:'AED 594K', d:"Apr–Aug'26 avg vs 664K prior six months", dir:'down' }
@@ -734,6 +745,7 @@ function frame(o, hint, showTitle=true){
 function shead(p){
   return `<div class="shead">
     <div class="stack">
+      ${p.kicker ? `<span class="shk">${esc(p.kicker)}</span>` : ''}
       <h2>${esc(p.title)}</h2>
       ${p.tagline ? `<span class="tl">${esc(p.tagline)}</span>` : ''}
     </div>
