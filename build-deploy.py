@@ -46,7 +46,11 @@ def main():
         uris[n] = f'data:{mime};base64,' + base64.b64encode(open(dst, 'rb').read()).decode()
 
     for v in vids:
-        sh('avconvert', '--source', f'assets/{v}.mp4', '--output', f'{OUT}/assets/{v}.mp4',
+        src, dst = f'assets/{v}.mp4', f'{OUT}/assets/{v}.mp4'
+        # re-encoding takes a minute a video, so only redo it when the master changed
+        if os.path.exists(dst) and os.path.getmtime(dst) >= os.path.getmtime(src):
+            continue
+        sh('avconvert', '--source', src, '--output', dst,
            '--preset', VIDEO_PRESET.get(v, 'Preset960x540'), '--replace')
 
     # one copy of each image, referenced by name — several slides share them

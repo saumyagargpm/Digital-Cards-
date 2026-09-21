@@ -354,7 +354,9 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
   gap:clamp(8px,1vw,18px);margin-inline:calc(-1 * clamp(8px,1.2vw,22px))}
 /* equal cells keep every screen — and an empty slot waiting on an asset —
    the same width, so the row reads as one set */
-.screens .shot{flex:1 1 0;min-width:0}
+/* caption and screen centre together in the row, rather than hanging from
+   its foot with the slack above them */
+.screens .shot{flex:1 1 0;min-width:0;justify-content:center}
 /* the recording takes all the height the slide has; the stills step down
    just enough to keep it leading */
 .screens .shot.sm{--scale:.86}
