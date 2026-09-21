@@ -765,9 +765,9 @@ const PANELS = {
         { kind:'red',  lab:"Jul–Aug'24 · cleanup" },
         { kind:'line', lab:'Chargeback rate' }
       ],
+      /* the AED 4.45M peak is annotated on the chart itself, so no tile repeats it */
       metrics:[
         { k:'Peak chargeback rate', v:'23.9%',    d:"May'24 · 15.7% average over the eight bad months", dir:'down' },
-        { k:'Fraud-inflated peak',  v:'AED 4.45M',d:"Mar'24 · not a base we could hold", dir:'down' },
         { k:'After the cleanup',    v:'~0%',      d:"Aug'24 onward · risk back to baseline", dir:'up' },
         { k:'Clean base to build on', v:'AED 253K', d:"Sep'24 · where the real business restarts", dir:'up' }
       ] },
