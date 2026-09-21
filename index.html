@@ -207,7 +207,8 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
   padding:0 clamp(26px,5vw,72px);max-width:min(62%,880px)}
 /* the artwork keeps clear air above and below it rather than running the
    full height of the slide */
-.cover-art{position:absolute;right:clamp(8px,1.6vw,32px);top:50%;
+/* the art clears the right edge by the same margin the text keeps on the left */
+.cover-art{position:absolute;right:clamp(26px,5vw,72px);top:50%;
   transform:translateY(-50%);
   max-height:74%;max-width:50%;width:auto;height:auto;object-fit:contain;
   filter:drop-shadow(0 30px 60px rgba(0,0,0,.55));z-index:1;pointer-events:none}
