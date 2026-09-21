@@ -174,15 +174,11 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .navbtn[disabled]:hover{background:rgba(255,255,255,.04);color:var(--tx);border-color:var(--ln)}
 .posind{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--tx3);
   flex:none;min-width:60px;text-align:center}
-.botlabel{flex:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--tx3);white-space:nowrap;max-width:34ch;
-  overflow:hidden;text-overflow:ellipsis}
 .botspacer{flex:1}
 .sitemaplink{flex:none;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;color:var(--tx3);text-decoration:none;border:1px solid var(--ln);
   border-radius:99px;padding:7px 12px;transition:.15s}
 .sitemaplink:hover{border-color:var(--y);color:var(--y)}
-@media (max-width:900px){ .botlabel{display:none} }
 
 /* focus strip — segmented rail, the only progress in the deck */
 .jstrip{display:flex;align-items:center;gap:6px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
@@ -633,7 +629,6 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
     <button class="navbtn" id="next" title="Next (→)">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M9 5l7 7-7 7"/></svg></button>
     <div class="botspacer"></div>
-    <span class="botlabel" id="botlabel"></span>
     <div class="secdrop" id="secdrop">
       <button class="secdrop-btn" id="secbtn" aria-haspopup="listbox" aria-expanded="false">
         <span class="cur" id="seccur">Cover</span>
@@ -1242,8 +1237,7 @@ function syncNav(){
   $('#prev').disabled = (index===0 && si===0);
   $('#next').disabled = (index===n-1 && si===SEC_ORDER.length-1);
   $('#posind').textContent = n>1 ? `${index+1} / ${n}` : `${si+1} / ${SEC_ORDER.length}`;
-  const cur = panels[index];
-  $('#botlabel').textContent = cur && cur.dataset.nm ? cur.dataset.nm : '';
+
 }
 
 let scrollTick;
