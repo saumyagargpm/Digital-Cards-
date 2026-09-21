@@ -18,7 +18,7 @@ Open `index.html` in any browser.
 2. **Fresh Look** — *Digital Cards Before* and *Digital Card Fresh Look*
 3. **Web Experience**
 4. **Functional Optimisations**
-5. **Performance**
+5. **Performance** — *Digital Cards GMV* and *Performance*
 6. **End**
 
 ## Editing the content
@@ -37,6 +37,15 @@ slides as it needs. A slide picks a `layout`:
 | `split` | one large screen beside a list of points | `media`, `points` |
 | `cards` | a numbered grid of cards | `cards: [{ t, d }]` |
 | `metrics` | metric tiles over a chart area | `metrics`, `box` |
+| `chart` | a monthly bar chart above metric tiles | `series`, `bands`, `marks`, `legend`, `metrics` |
+
+Any slide can also carry `sticky:'…'` — a note pinned over the corner, for
+saying who still owes the slide its content.
+
+For `chart`, `series` is `[{ m:'Nov 23', v:1422.6 }]` with `v` in thousands;
+add `pre:true` to grey a bar out. `bands` shades a range by series index
+(`{ from, to, kind:'red'|'green', lab }`) and `marks` labels one bar
+(`{ at, lab }`).
 
 ### Adding a screenshot
 

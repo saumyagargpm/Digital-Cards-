@@ -444,6 +444,32 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .mbox .body > *{flex:1;min-height:0}
 
 /* ==================================================================== */
+/*  GMV CHART                                                          */
+/* ==================================================================== */
+.chwrap{flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(10px,1.2vw,16px)}
+.chplot{flex:1;min-height:0;background:var(--card);border:1px solid var(--ln);
+  border-radius:20px;padding:15px 18px 10px;display:flex;flex-direction:column}
+.chplot svg{flex:1;min-height:0;width:100%;overflow:visible}
+.chplot .bar{fill:var(--y);opacity:.85}
+.chplot .bar.pre{fill:rgba(244,245,247,.30)}
+.chplot .grid{stroke:rgba(255,255,255,.07);stroke-width:1}
+.chplot .zero{stroke:rgba(255,255,255,.18)}
+.chplot .ylab,.chplot .xlab{font-family:var(--mono);font-size:9px;fill:var(--tx3);letter-spacing:.06em}
+.chplot .ylab{text-anchor:end} .chplot .xlab{text-anchor:middle}
+.chplot .bandbox.red{fill:rgba(242,118,107,.13);stroke:rgba(242,118,107,.42)}
+.chplot .bandbox.green{fill:rgba(87,217,163,.12);stroke:rgba(87,217,163,.42)}
+.chplot .bandlab{font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;
+  text-transform:uppercase;text-anchor:middle}
+.chplot .bandlab.red{fill:var(--coral)} .chplot .bandlab.green{fill:var(--live)}
+.chplot .peak{font-family:var(--mono);font-size:9px;fill:var(--tx2);text-anchor:middle}
+.chcap{flex:none;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3)}
+.chcap i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;
+  vertical-align:-1px}
+.chcap .red i{background:rgba(242,118,107,.45);outline:1px solid rgba(242,118,107,.6)}
+.chcap .green i{background:rgba(87,217,163,.45);outline:1px solid rgba(87,217,163,.6)}
+
+/* ==================================================================== */
 /*  CARD GRID (functional optimisations)                                */
 /* ==================================================================== */
 .cgrid{flex:1;min-height:0;overflow:auto;display:grid;
@@ -568,6 +594,40 @@ const PANELS = {
   ],
 
   performance: [
+    /* pre:true = the fraud-inflated months, greyed so the clean base reads clearly */
+    { title:'Digital Cards GMV', tagline:'Nov 2023 – Aug 2026 · three phases',
+      layout:'chart', unit:'AED · monthly GMV',
+      series:[
+        { m:'Nov 23', v:1422.6, pre:true }, { m:'Dec 23', v:741.4,  pre:true },
+        { m:'Jan 24', v:2625.4, pre:true }, { m:'Feb 24', v:4226.9, pre:true },
+        { m:'Mar 24', v:4448.1, pre:true }, { m:'Apr 24', v:2884.9, pre:true },
+        { m:'May 24', v:2517.9, pre:true }, { m:'Jun 24', v:1438.7, pre:true },
+        { m:'Jul 24', v:186.6,  pre:true }, { m:'Aug 24', v:49.8,   pre:true },
+        { m:'Sep 24', v:252.8 }, { m:'Oct 24', v:405.5 }, { m:'Nov 24', v:432.7 },
+        { m:'Dec 24', v:352.3 }, { m:'Jan 25', v:328.1 }, { m:'Feb 25', v:270.9 },
+        { m:'Mar 25', v:334.0 }, { m:'Apr 25', v:254.0 }, { m:'May 25', v:316.2 },
+        { m:'Jun 25', v:546.0 }, { m:'Jul 25', v:573.3 }, { m:'Aug 25', v:550.3 },
+        { m:'Sep 25', v:502.2 }, { m:'Oct 25', v:621.6 }, { m:'Nov 25', v:638.3 },
+        { m:'Dec 25', v:735.5 }, { m:'Jan 26', v:687.8 }, { m:'Feb 26', v:572.1 },
+        { m:'Mar 26', v:728.8 }, { m:'Apr 26', v:597.4 }, { m:'May 26', v:711.9 },
+        { m:'Jun 26', v:634.5 }, { m:'Jul 26', v:479.2 }, { m:'Aug 26', v:547.1 }
+      ],
+      bands:[
+        { from:8,  to:9,  kind:'red',   lab:'Fraud filtering tightened' },
+        { from:31, to:33, kind:'green', lab:'New flow at 100%' }
+      ],
+      marks:[ { at:4, lab:'AED 4.45M — fraud-inflated peak' } ],
+      legend:[
+        { kind:'red',   lab:'Jul–Aug 24 · fraud cleanup' },
+        { kind:'green', lab:'Jun 26 · buying-flow revamp at 100% of App' }
+      ],
+      metrics:[
+        { k:'Chargebacks at peak', v:'23.9%', d:'May 24 share of GMV → ~0 after cleanup', dir:'down' },
+        { k:'Organic growth',      v:'2.9x',  d:"Sep'24 → Mar'26 · AED 0.25M → 0.73M", dir:'up' },
+        { k:'A/B test GMV lift',   v:'+23%',  d:'Test vs control · AE & SA, 50/50 split', dir:'up' },
+        { k:'Since App-wide launch', v:'AED 594K', d:"Apr–Aug'26 avg vs 664K prior 6 mo", dir:'down' }
+      ] },
+
     { title:'Performance', tagline:'What moved after launch',
       tag:'Placeholder', layout:'metrics', sticky:'Amit will update',
       metrics:[
@@ -703,7 +763,62 @@ function bodyMetrics(p){
   </div>`;
 }
 
-const BODIES = { screens:bodyScreens, beforeafter:bodyBeforeAfter, split:bodySplit, cards:bodyCards, metrics:bodyMetrics };
+/* monthly GMV as bars, with the phases that explain the shape drawn over the
+   top — the chart is the argument, the tiles underneath are the receipts */
+function bodyChart(p){
+  const s = p.series || [], n = s.length;
+  const W = 1000, H = 300, L = 46, R = 8, T = 18, B = 26;   /* viewBox + margins */
+  const pw = W - L - R, ph = H - T - B;
+  const max = Math.max(...s.map(d=>d.v)) * 1.08;
+  const step = pw / n, bw = Math.max(3, step * 0.62);
+  const x = i => L + step * i + (step - bw) / 2;
+  const y = v => T + ph - (v / max) * ph;
+
+  /* y axis at a round AED step, so the gridlines read as money not pixels */
+  const tick = max > 4000 ? 1000 : max > 2000 ? 500 : 200;
+  let axis = '';
+  for (let v = 0; v <= max; v += tick){
+    axis += `<line class="grid${v?'':' zero'}" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/>
+      <text class="ylab" x="${L-9}" y="${y(v)+3}">${v?(v/1000).toFixed(v%1000?1:0)+'M':'0'}</text>`;
+  }
+
+  const bars = s.map((d,i)=>
+    `<rect class="bar${d.pre?' pre':''}" x="${x(i)}" y="${y(d.v)}" width="${bw}"
+       height="${Math.max(1, T+ph-y(d.v))}" rx="1.5"><title>${esc(d.m)} — AED ${d.v}K</title></rect>`).join('');
+
+  /* a label every nth bar, else the axis turns into a smear */
+  const every = Math.ceil(n / 12);
+  const xlabs = s.map((d,i)=> i % every ? '' :
+    `<text class="xlab" x="${x(i)+bw/2}" y="${H-B+16}">${esc(d.m)}</text>`).join('');
+
+  const bands = (p.bands||[]).map(b=>{
+    const x1 = L + step * b.from, x2 = L + step * (b.to + 1);
+    return `<rect class="bandbox ${b.kind}" x="${x1}" y="${T}" width="${x2-x1}" height="${ph}" rx="4"/>
+      <text class="bandlab ${b.kind}" x="${(x1+x2)/2}" y="${T-6}">${esc(b.lab)}</text>`;
+  }).join('');
+
+  const notes = (p.marks||[]).map(mk=>
+    `<text class="peak" x="${x(mk.at)+bw/2}" y="${y(s[mk.at].v)-7}">${esc(mk.lab)}</text>`).join('');
+
+  return `<div class="chwrap">
+    <div class="chplot">
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+        ${bands}${axis}${bars}${notes}${xlabs}
+      </svg>
+      <div class="chcap">
+        ${(p.legend||[]).map(l=>`<span class="${l.kind}"><i></i>${esc(l.lab)}</span>`).join('')}
+        ${p.unit?`<span style="margin-left:auto">${esc(p.unit)}</span>`:''}
+      </div>
+    </div>
+    <div class="mgrid">${(p.metrics||[]).map(m=>`
+      <div class="mtile"><span class="k">${esc(m.k)}</span>
+        <div class="v">${esc(m.v)}</div>
+        ${m.d?`<div class="dl${m.dir==='up'?' up':m.dir==='down'?' down':''}">${esc(m.d)}</div>`:''}
+      </div>`).join('')}</div>
+  </div>`;
+}
+
+const BODIES = { screens:bodyScreens, beforeafter:bodyBeforeAfter, split:bodySplit, cards:bodyCards, metrics:bodyMetrics, chart:bodyChart };
 
 function panelOf(p){
   const body = (BODIES[p.layout] || (()=>`<div class="ph" style="flex:1"><span class="t">Content</span>
