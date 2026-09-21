@@ -240,7 +240,7 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 /*  SLIDE HEAD                                                         */
 /* ==================================================================== */
 .shead{flex:none;display:flex;align-items:flex-start;gap:16px;
-  padding-bottom:clamp(15px,2.2vh,24px)}
+  padding-bottom:clamp(12px,1.8vh,20px)}
 /* a thin yellow rule anchors the title block now that the slide numbers
    are gone, and carries the eye down to the subtitle */
 .shead .stack{position:relative;display:flex;flex-direction:column;gap:10px;
@@ -344,9 +344,10 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 /* equal cells keep every screen — and an empty slot waiting on an asset —
    the same width, so the row reads as one set */
 .screens .shot{flex:1 1 0;min-width:0}
-/* a supporting still steps down so the recording beside it clearly leads */
-.screens .shot.sm{--scale:.72}
-.screens .shot.vid{--scale:.92}
+/* the recording takes all the height the slide has; the stills step down
+   just enough to keep it leading */
+.screens .shot.sm{--scale:.86}
+.screens .shot.vid{--scale:1}
 .screens .fr.empty{justify-self:stretch;width:100%;height:auto;align-self:end}
 @media (max-width:900px){ .screens{overflow-x:auto;justify-content:flex-start} }
 
