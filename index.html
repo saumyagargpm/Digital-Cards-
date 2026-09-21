@@ -490,7 +490,10 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .mtile .v{font-family:var(--mono);font-size:clamp(24px,2.5vw,34px);font-weight:800;
   letter-spacing:-.04em;line-height:1;margin-top:10px;color:var(--y)}
 .mtile .v.ph-v{color:rgba(244,245,247,.22)}
-.mtile .dl{margin-top:9px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--tx3)}
+/* the label reads under the number it belongs to */
+.mtile .lab{margin-top:9px;font-family:var(--mono);font-size:9.5px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--tx2)}
+.mtile .dl{margin-top:7px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--tx3)}
 .mtile .dl.up{color:var(--live)} .mtile .dl.down{color:var(--coral)}
 .mbox{flex:1;min-height:0;background:var(--card);border:1px solid var(--ln);border-radius:20px;
   padding:16px 18px;display:flex;flex-direction:column}
@@ -775,7 +778,7 @@ const PANELS = {
     /* post-2025 is a step change, not a slope — two run-rate lines make the
        shift legible, and the funnel says which product change caused it */
     { kicker:'Phase 2 · Post-2025', title:'Growth and the Revamp', tagline:'A new baseline, then the buying-flow rollout',
-      layout:'chart', unit:'AED · monthly GMV',
+      layout:'chart',
       series:[
         { m:'Jan 25', v:328.1 }, { m:'Feb 25', v:270.9 }, { m:'Mar 25', v:334.0 },
         { m:'Apr 25', v:254.0 }, { m:'May 25', v:316.2 }, { m:'Jun 25', v:546.0 },
@@ -791,23 +794,13 @@ const PANELS = {
       ],
       bands:[
         { from:4,  to:5,  kind:'green', lab:'Assortment +10% → 2x GMV' },
-        { from:17, to:19, kind:'gold',  lab:'New flow — no uplift' }
+        { from:11, to:19, kind:'gold', lab:'New flow' }
       ],
-      legend:[
-        { kind:'green', lab:"May–Jun'25 · assortment up 10%, GMV 2x" },
-        { kind:'gold',  lab:"Jun'26 · App-wide rollout, no uplift" }
-      ],
-      funnel:{ t:'A/B lift · test vs control', rows:[
-        { k:'GMV',          v:23 }, { k:'Add to cart',   v:14 },
-        { k:'AOV',          v:13 }, { k:'Orders',        v:8  },
-        { k:'Cards / order',v:6  }, { k:'Units sold',    v:3  },
-        { k:'Brands / order',v:0 }
-      ] },
       metrics:[
-        { k:'Assortment', v:'10%', d:'Relevant & popular assortment like Playstore etc.', dir:'up' },
-        { k:'GMV uplift', v:'2x',  d:'Relevant & popular assortment like Playstore etc.', dir:'up' },
-        { k:'Rollout reached',  v:'100%',  d:"All App users since mid-Jun'26", dir:'up' },
-        { k:'Since rollout',    v:'AED 594K', d:"Apr–Aug'26 avg vs 664K prior six months", dir:'down' }
+        /* each tile leads with its number, its label sits underneath */
+        { v:'10%',      lab:'Assortment increase',  d:'Relevant & popular assortment like Playstore etc.' },
+        { v:'2x',       lab:'GMV uplift',           d:'Post interventions on assortment & discovery.' },
+        { v:'AED 600K', lab:'Monthly GMV baseline', d:'Post revamp' }
       ] }
   ]
 };
@@ -970,8 +963,9 @@ function bodyMetrics(p){
   const b = p.box;
   return `<div class="mwrap">
     <div class="mgrid">${(p.metrics||[]).map(m=>`
-      <div class="mtile"><span class="k">${esc(m.k)}</span>
+      <div class="mtile">${m.k?`<span class="k">${esc(m.k)}</span>`:''}
         <div class="v${m.v==='—'?' ph-v':''}">${esc(m.v)}</div>
+        ${m.lab?`<div class="lab">${esc(m.lab)}</div>`:''}
         ${m.d?`<div class="dl${m.dir==='up'?' up':m.dir==='down'?' down':''}">${esc(m.d)}</div>`:''}
       </div>`).join('')}</div>
     ${b ? `<div class="mbox"><div class="bt">${esc(b.t||'Detail')}
@@ -1021,8 +1015,9 @@ function bodyChart(p){
 
   const bands = (p.bands||[]).map(b=>{
     const x1 = L + step * b.from, x2 = L + step * (b.to + 1);
-    return `<rect class="bandbox ${b.kind}" x="${x1}" y="${T}" width="${x2-x1}" height="${ph}" rx="4"/>
-      <text class="bandlab ${b.kind}" x="${(x1+x2)/2}" y="${T-6}">${esc(b.lab)}</text>`;
+    /* a band can stand on its own, so only label it when there is a label */
+    return `<rect class="bandbox ${b.kind}" x="${x1}" y="${T}" width="${x2-x1}" height="${ph}" rx="4"/>`
+      + (b.lab ? `<text class="bandlab ${b.kind}" x="${(x1+x2)/2}" y="${T-6}">${esc(b.lab)}</text>` : '');
   }).join('');
 
   const notes = (p.marks||[]).map(mk=>
@@ -1072,16 +1067,17 @@ function bodyChart(p){
         <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
           ${bands}${axis}${bars}${bases}${notes}${line}${xlabs}
         </svg>
-        <div class="chcap">
+        ${(p.legend&&p.legend.length)||p.unit ? `<div class="chcap">
           ${(p.legend||[]).map(l=>`<span class="${l.kind}"><i></i>${esc(l.lab)}</span>`).join('')}
           ${p.unit?`<span style="margin-left:auto">${esc(p.unit)}</span>`:''}
-        </div>
+        </div>` : ''}
       </div>
       ${funnel}
     </div>
     <div class="mgrid">${(p.metrics||[]).map(m=>`
-      <div class="mtile"><span class="k">${esc(m.k)}</span>
+      <div class="mtile">${m.k?`<span class="k">${esc(m.k)}</span>`:''}
         <div class="v">${esc(m.v)}</div>
+        ${m.lab?`<div class="lab">${esc(m.lab)}</div>`:''}
         ${m.d?`<div class="dl${m.dir==='up'?' up':m.dir==='down'?' down':''}">${esc(m.d)}</div>`:''}
       </div>`).join('')}</div>
   </div>`;
