@@ -411,6 +411,17 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .banote{flex:none;margin-top:11px;font-size:11.5px;line-height:1.5;color:var(--tx3)}
 
 /* ==================================================================== */
+/*  STACK — small slots down the left, one large screen on the right    */
+/* ==================================================================== */
+.stackrow{flex:1;min-height:0;display:flex;align-items:stretch;
+  gap:clamp(14px,2vw,34px)}
+.stackcol{flex:0 0 clamp(170px,16vw,250px);min-width:0;display:flex;
+  flex-direction:column;gap:clamp(8px,1.4vh,18px)}
+.stackcol .shot{flex:1 1 0;min-height:0;justify-content:center}
+.stackrow .shot.hero{flex:1 1 auto;min-width:0;justify-content:center}
+@media (max-width:900px){ .stackrow{flex-direction:column} }
+
+/* ==================================================================== */
 /*  SPLIT — a single frame beside a list of points                      */
 /* ==================================================================== */
 .split{flex:1;min-height:0;display:grid;grid-template-columns:1.25fr .85fr;
@@ -583,13 +594,14 @@ const PANELS = {
 
   web: [
     { title:'Web Experience', tagline:'The card journey on web',
-      tag:'Placeholder', layout:'split', device:'web',
-      media:{ cap:'Web screen — placeholder' },
-      points:[
-        { h:'Point one', d:'Placeholder — what the web surface now covers.' },
-        { h:'Point two', d:'Placeholder — how it differs from the app journey.' },
-        { h:'Point three', d:'Placeholder — what it unlocks next.' }
-      ] }
+      tag:'Placeholder', layout:'stack',
+      /* one slot per point, waiting on its mock */
+      items:[
+        { cap:'Mock one' },
+        { cap:'Mock two' },
+        { cap:'Mock three' }
+      ],
+      hero:{ img:'assets/web-walkthrough.mp4', cap:'Walkthrough' } }
   ],
 
   functional: [
@@ -697,6 +709,19 @@ function bodyScreens(p){
     </div>`).join('')}</div>`;
 }
 
+/* a column of smaller slots beside one large screen or recording */
+function bodyStack(p){
+  const shot = (sc, cls) => `
+    <div class="shot web ${cls}">
+      <div class="${frCls(sc)}">${frame(sc, cls === 'hero' ? 'recording' : 'mock', false)}</div>
+      <span class="cap">${esc(sc.cap||'')}</span>
+    </div>`;
+  return `<div class="stackrow">
+    <div class="stackcol">${(p.items||[]).map(it => shot(it, 'sm')).join('')}</div>
+    ${p.hero ? shot(p.hero, 'hero') : ''}
+  </div>`;
+}
+
 function bodySplit(p){
   const m = p.media || {};
   const dev = p.device === 'phone' ? ' phone' : p.device === 'free' ? ' free' : '';
@@ -740,7 +765,7 @@ function bodyMetrics(p){
   </div>`;
 }
 
-const BODIES = { screens:bodyScreens, beforeafter:bodyBeforeAfter, split:bodySplit, cards:bodyCards, metrics:bodyMetrics };
+const BODIES = { screens:bodyScreens, stack:bodyStack, beforeafter:bodyBeforeAfter, split:bodySplit, cards:bodyCards, metrics:bodyMetrics };
 
 function panelOf(p){
   const body = (BODIES[p.layout] || (()=>`<div class="ph" style="flex:1"><span class="t">Content</span>
