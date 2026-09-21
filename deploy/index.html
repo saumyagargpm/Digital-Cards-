@@ -354,7 +354,9 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
   gap:clamp(8px,1vw,18px);margin-inline:calc(-1 * clamp(8px,1.2vw,22px))}
 /* equal cells keep every screen — and an empty slot waiting on an asset —
    the same width, so the row reads as one set */
-.screens .shot{flex:1 1 0;min-width:0}
+/* caption and screen centre together in the row, rather than hanging from
+   its foot with the slack above them */
+.screens .shot{flex:1 1 0;min-width:0;justify-content:center}
 /* the recording takes all the height the slide has; the stills step down
    just enough to keep it leading */
 .screens .shot.sm{--scale:.86}
@@ -416,6 +418,10 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
   background:rgba(255,255,255,.03);box-shadow:none}
 .shot .cap{flex:none;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;color:var(--tx3);text-align:center;line-height:1.3}
+/* on a row of screens the caption sits above the screen it names, larger
+   and with room between the two */
+.screens .shot .cap{order:-1;margin-bottom:clamp(7px,1.1vh,14px);
+  font-size:clamp(11px,.92vw,13px);letter-spacing:.12em;color:var(--tx2)}
 .shot.before .cap{color:var(--tx3)}
 .shot.after .cap{color:var(--y)}
 .shot.after .fr.empty{border-color:rgba(254,238,0,.34)}
@@ -591,7 +597,7 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
   color:var(--tx2);letter-spacing:-.003em}
 /* the screen sits under the points and takes whatever room is left */
 .colshot{flex:1 1 auto;min-height:0;margin-top:clamp(12px,1.8vh,20px)}
-.colshot .fr{box-shadow:none}
+.colshot .fr,.colshot .fr img,.colshot .fr video{box-shadow:none;corner-shape:squircle}
 .colshot .fr.empty{width:100%;height:100%;aspect-ratio:auto}
 
 /* ==================================================================== */
@@ -686,8 +692,8 @@ const COVER = {
   kicker:'noon · consumer product',
   title:['Digital Card', 'Experience Revamp'],   /* second line takes the yellow */
   lead:'A rebuilt digital card experience — new look, tighter flows '
-      +'and the performance to back them.',
-  sub:'What changed, why it changed, and what the numbers did after.'
+      +'and better security.',
+  sub:'What changed, why it changed, and how the numbers look after that.'
 };
 
 /* Each panel: { sn, title, tagline, tag, layout, ...layout payload }      */
@@ -696,11 +702,11 @@ const PANELS = {
     { title:'Digital Cards Before', tagline:'The experience we started from',
       layout:'screens',
       screens:[
-        { img:A['before-1'], cap:'Digital Cards home' },
-        { img:A['before-2'], cap:'Select a card' },
-        { img:A['before-3'], cap:'Card detail' },
-        { img:A['before-4'], cap:'Confirm & pay' },
-        { img:A['before-5'], cap:'Success' }
+        { img:A['before-1'], cap:'Digital Cards home', sc:.74 },
+        { img:A['before-2'], cap:'Select a card', sc:.74 },
+        { img:A['before-3'], cap:'Card detail', sc:.74 },
+        { img:A['before-4'], cap:'Confirm & pay', sc:.74 },
+        { img:A['before-5'], cap:'Success', sc:.74 }
       ] },
 
     { title:'Digital Card Fresh Look', tagline:'The rebuilt experience',
@@ -798,7 +804,7 @@ const PANELS = {
 
     /* post-2025 is a step change, not a slope — two run-rate lines make the
        shift legible, and the funnel says which product change caused it */
-    { kicker:'Phase 2 · Post-2025', title:'Growth and Revamp', tagline:'A new baseline, then the buying-flow rollout',
+    { kicker:'Phase 2 · 2025 Onwards', title:'Growth and Revamp', tagline:'New baseline & Revamped Flow',
       layout:'chart',
       series:[
         { m:'Jan 25', v:328.1 }, { m:'Feb 25', v:270.9 }, { m:'Mar 25', v:334.0 },
@@ -901,7 +907,8 @@ function bodyBeforeAfter(p){
 function bodyScreens(p){
   const dev = p.device === 'web' ? ' web' : '';
   return `<div class="screens">${(p.screens||[]).map(sc=>`
-    <div class="shot${dev}${sc.after?' after':''}${sc.small?' sm':''}${sc.video?' vid':''}" style="flex-grow:${sc.w||1}">
+    <div class="shot${dev}${sc.after?' after':''}${sc.small?' sm':''}${sc.video?' vid':''}"
+      style="flex-grow:${sc.w||1}${sc.sc?`;--scale:${sc.sc}`:''}">
       <div class="${frCls(sc)}">${frame(sc, sc.hint||'screen', false)}</div>
       <span class="cap">${esc(sc.cap||'')}</span>
     </div>`).join('')}</div>`;
@@ -1202,7 +1209,8 @@ function fitShots(){
     const ar = (mw && mh) ? mw/mh : (shot.classList.contains('web') ? 16/10 : 9/19.5);
     const cap = shot.querySelector('.cap');
     const gap = parseFloat(getComputedStyle(shot).rowGap) || 0;
-    const availH = shot.clientHeight - (cap ? cap.offsetHeight + gap : 0);
+    const capM = cap ? (parseFloat(getComputedStyle(cap).marginBottom) || 0) : 0;
+    const availH = shot.clientHeight - (cap ? cap.offsetHeight + capM + gap : 0);
     const availW = shot.clientWidth;
     if (availH <= 0 || availW <= 0) return;
     const scale = parseFloat(getComputedStyle(shot).getPropertyValue('--scale')) || 1;
@@ -1212,9 +1220,11 @@ function fitShots(){
     fr.style.width  = w + 'px';
     /* a device's corner is a fixed share of its width, so the radius has to
        follow the size the screen ends up at */
-    const rad = Math.round(w * (shot.classList.contains('web') ? .025 : .08));
+    const flush = shot.classList.contains('colshot');
+    const share = shot.classList.contains('web') ? .03 : flush ? .15 : .105;
+    const rad = Math.round(w * share);
     /* a screen that runs to the foot of its box keeps its top corners only */
-    const r = shot.classList.contains('colshot') ? `${rad}px ${rad}px 0 0` : `${rad}px`;
+    const r = flush ? `${rad}px ${rad}px 0 0` : `${rad}px`;
     fr.style.borderRadius = r;
     /* the frame clips its contents, but a video is often composited on its
        own layer and ignores that clip — so it carries the corner too */
