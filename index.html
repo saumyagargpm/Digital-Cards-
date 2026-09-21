@@ -562,10 +562,8 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 /* ==================================================================== */
 /*  COLUMNS — three standing boxes                                      */
 /* ==================================================================== */
-/* the boxes match each other's height and their headings line up, while the
-   row as a whole sits in the middle of the slide rather than filling it */
+/* the boxes match each other's height and their headings line up */
 .cols{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
-  grid-auto-rows:minmax(0,min-content);align-content:center;
   gap:clamp(12px,1.5vw,24px)}
 @media (max-width:900px){ .cols{grid-template-columns:1fr;overflow-y:auto} }
 .colbox{min-height:0;display:flex;flex-direction:column;
@@ -578,14 +576,18 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .colbox h3{margin:clamp(14px,1.8vh,20px) 0 clamp(12px,1.6vh,18px);
   font-size:clamp(15px,1.35vw,20px);font-weight:800;letter-spacing:-.02em;
   line-height:1.2;color:var(--tx)}
-/* flex:0 1 auto keeps the list from stretching, so centring holds */
-.colpts{flex:0 1 auto;margin:0;padding:0;list-style:none;display:flex;
-  flex-direction:column;gap:clamp(9px,1.3vh,15px);min-height:0;overflow:auto}
+/* the points keep their full height — the screen below takes what is left,
+   rather than the list being squeezed and scrolling */
+.colpts{flex:none;margin:0;padding:0;list-style:none;display:flex;
+  flex-direction:column;gap:clamp(9px,1.3vh,15px)}
 .colpts li{display:flex;gap:11px;align-items:flex-start}
 .colpts li i{flex:none;width:6px;height:6px;border-radius:50%;
   background:var(--y);margin-top:.5em}
 .colpts li span{font-size:clamp(12px,1.02vw,14.5px);line-height:1.5;
   color:var(--tx2);letter-spacing:-.003em}
+/* the screen sits under the points and takes whatever room is left */
+.colshot{flex:1 1 auto;min-height:0;margin-top:clamp(12px,1.8vh,20px)}
+.colshot .fr.empty{width:100%;height:100%;aspect-ratio:auto}
 
 /* ==================================================================== */
 /*  CARD GRID (functional optimisations)                                */
@@ -718,23 +720,24 @@ const PANELS = {
   ],
 
   functional: [
-    { title:'What all changed?', layout:'columns',
+    { title:'Overview', tagline:'What all changed & how we did it?',
+      layout:'columns',
       columns:[
-        { icon:'spark', t:'Enhanced user experience', points:[
-          'A fresh new look of both App &amp; Web Experiences.',
-          'Highlighting the visual aspect of the digital cards to have better recall with brand logos.',
-          'Better navigation &amp; grouping of different country &amp; amount variants of the brand cards.',
-          'Multi Card Checkout to have a hassle free journey.',
-          'Better communication through clear order statuses &amp; email comms.'
+        { icon:'spark', t:'Enhanced user experience', shot:{}, points:[
+          'A fresh look across App &amp; Web.',
+          'Visual-first cards, so brands are recognised at a glance.',
+          'Country &amp; amount variants grouped, not scattered.',
+          'Multi-card checkout in one go.',
+          'Clear order statuses and email comms.'
         ] },
-        { icon:'grid', t:'Bigger assortment with better discoverability', points:[
-          'We onboarded 2 merchants — LikeCards &amp; JokerCards — to provide the assortment for the digital cards.',
-          'This helped us surface more choices to the user.',
-          'Activated entry-points for relevant search terms to guide users.'
+        { icon:'grid', t:'Bigger assortment, better discovery', shot:{}, points:[
+          'LikeCards &amp; JokerCards onboarded as merchants.',
+          'More choice surfaced to the user.',
+          'Search entry-points on the terms people use.'
         ] },
-        { icon:'shield', t:'More security', points:[
-          'Reducing chargebacks by introducing a phone number verification flow.',
-          'Applied tighter checks &amp; alerts for merchants to make sure the service is provided smoothly to users.'
+        { icon:'shield', t:'More security', shot:{}, points:[
+          'Phone verification to cut chargebacks.',
+          'Tighter merchant checks and alerts.'
         ] }
       ] }
   ],
@@ -765,9 +768,9 @@ const PANELS = {
       ],
       /* the AED 4.45M peak is annotated on the chart itself, so no tile repeats it */
       metrics:[
-        { k:'Peak chargeback rate', v:'24%',      d:"May'24 · 16% average over the eight bad months", dir:'down' },
-        { k:'After the cleanup',    v:'~0%',      d:"Aug'24 onward · risk back to baseline", dir:'up' },
-        { k:'Clean base to build on', v:'AED 253K', d:"Sep'24 · where the real business restarts", dir:'up' }
+        { v:'24%',      lab:'Peak chargeback rate',   d:"May'24 · 16% average over the eight bad months", dir:'down' },
+        { v:'~0%',      lab:'After the cleanup',      d:"Aug'24 onward · risk back to baseline", dir:'up' },
+        { v:'AED 253K', lab:'Clean base to build on', d:"Sep'24 · where the real business restarts", dir:'up' }
       ] },
 
     /* post-2025 is a step change, not a slope — two run-rate lines make the
@@ -809,9 +812,9 @@ const END = {
 /* ====================================================================== */
 const SECTIONS = [
   { id:'cover',       label:'Cover' },
+  { id:'functional',  label:'Overview' },
   { id:'fresh',       label:'Fresh Look' },
   { id:'web',         label:'Web Experience' },
-  { id:'functional',  label:'Functional Optimisations' },
   { id:'performance', label:'Performance' },
   { id:'end',         label:'End' }
 ];
@@ -905,6 +908,10 @@ function bodyColumns(p){
       <h3>${c.t}</h3>
       <ul class="colpts">${(c.points||[]).map(pt=>`
         <li><i></i><span>${pt}</span></li>`).join('')}</ul>
+      ${c.shot ? `<div class="shot colshot">
+        <div class="${frCls(c.shot)}">${frame(c.shot,'screen goes here',false)}</div>
+        ${c.shot.cap ? `<span class="cap">${esc(c.shot.cap)}</span>` : ''}
+      </div>` : ''}
     </div>`).join('')}</div>`;
 }
 
@@ -1152,6 +1159,17 @@ function fitShots(){
   /* clear what the last pass set, or each run would measure the room the
      previous run had already shrunk */
   $$('#rail .bashots').forEach(row => { row.style.height = ''; row.style.flexGrow = ''; });
+
+  /* Columns hold different numbers of points, which would leave each screen
+     below them a different amount of room. Hold every list in a row to the
+     tallest, so the screens come out the same size. */
+  $$('#rail .cols').forEach(row => {
+    const lists = [...row.querySelectorAll('.colpts')];
+    if (lists.length < 2) return;
+    lists.forEach(l => { l.style.height = ''; });
+    const tall = Math.max(...lists.map(l => l.offsetHeight));
+    if (tall > 0) lists.forEach(l => { l.style.height = tall + 'px'; });
+  });
   $$('#rail .shot').forEach(shot => {
     const fr = shot.querySelector('.fr');
     if (!fr) return;
@@ -1231,12 +1249,24 @@ function currentIndex(){
   panels.forEach((el,i)=>{ const d = Math.abs(el.offsetLeft+el.offsetWidth/2-mid); if (d<bd){ bd=d; best=i; } });
   return best;
 }
+/* The counter used to number a slide within its own chapter, so a three
+   slide chapter read "3 / 3" halfway through the deck. Count across the
+   whole deck instead. */
+function slideCounts(){
+  return SEC_ORDER.map(id => (PANELS[id] || []).length || 1);
+}
+function slideTotal(){ return slideCounts().reduce((a,b)=>a+b, 0); }
+function slideNo(){
+  const si = SEC_ORDER.indexOf(state.sec);
+  return slideCounts().slice(0, si).reduce((a,b)=>a+b, 0) + index + 1;
+}
+
 function syncNav(){
   const n = panels.length, si = SEC_ORDER.indexOf(state.sec);
   index = Math.max(0, Math.min(n-1, index));
   $('#prev').disabled = (index===0 && si===0);
   $('#next').disabled = (index===n-1 && si===SEC_ORDER.length-1);
-  $('#posind').textContent = n>1 ? `${index+1} / ${n}` : `${si+1} / ${SEC_ORDER.length}`;
+  $('#posind').textContent = `${slideNo()} / ${slideTotal()}`;
 
 }
 

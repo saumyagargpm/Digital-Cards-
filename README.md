@@ -15,9 +15,9 @@ Open `index.html` in any browser.
 ## Chapters
 
 1. **Cover**
-2. **Fresh Look** — *Digital Cards Before* and *Digital Card Fresh Look*
-3. **Web Experience**
-4. **Functional Optimisations**
+2. **Overview** — what changed and how
+3. **Fresh Look** — *Digital Cards Before*, *Digital Card Fresh Look* and *Old vs New*
+4. **Web Experience**
 5. **Performance** — *Phase 1 · Pre-2025: Security* and *Phase 2 · Post-2025: Growth and Revamp*
 6. **End**
 
