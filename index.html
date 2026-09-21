@@ -160,6 +160,12 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .sticky b{display:block;font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
   opacity:.55;margin-bottom:5px}
 
+/* a slide arriving under the eased scroll lifts its content the last few
+   pixels, so the move finishes rather than stops */
+@keyframes settleIn{ from{opacity:.55;transform:translateY(14px)} to{opacity:1;transform:none} }
+.panel.settle > *{animation:settleIn .42s cubic-bezier(.22,.9,.24,1) .3s both}
+@media (prefers-reduced-motion:reduce){ .panel.settle > *{animation:none} }
+
 /* ==================================================================== */
 /*  BOTTOM BAR                                                         */
 /* ==================================================================== */
@@ -344,24 +350,37 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 /* equal cells keep every screen — and an empty slot waiting on an asset —
    the same width, so the row reads as one set */
 .screens .shot{flex:1 1 0;min-width:0}
+/* a supporting still steps down so the hero beside it clearly leads */
+.screens .shot.sm img,.screens .shot.sm video{max-height:76%}
 .screens .fr.empty{justify-self:stretch;width:100%;height:auto;align-self:end}
 @media (max-width:900px){ .screens{overflow-x:auto;justify-content:flex-start} }
 
 /* ==================================================================== */
 /*  BEFORE / AFTER                                                      */
 /* ==================================================================== */
-.ba{flex:1;min-height:0;display:flex;gap:clamp(10px,1.2vw,18px);align-items:stretch}
+.ba{flex:1;min-height:0;display:flex;gap:clamp(12px,1.6vw,30px);align-items:stretch}
 @media (max-width:900px){ .ba{overflow-x:auto} }
-.bapair{flex:1;min-width:0;display:flex;flex-direction:column;
-  background:var(--card);border:1px solid var(--ln);border-radius:22px;
-  padding:15px clamp(12px,1.3vw,20px) 14px;transition:.2s}
-.bapair:hover{border-color:var(--ln2);background:var(--card2)}
-.bapair .lbl{display:flex;align-items:baseline;gap:9px;flex:none}
-.bapair .lbl h3{font-size:14.5px;font-weight:800;letter-spacing:-.015em;color:var(--tx)}
+/* no card around a pair — the screens themselves carry the slide, and the
+   dividers between pairs keep the four groups legible */
+.bapair{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end}
+.bapair + .bapair{border-left:1px solid var(--ln);padding-left:clamp(12px,1.6vw,30px)}
+/* the title sits under its pair rather than floating at the top of the
+   slide — screens, their before/after tags, then the moment they show */
+.bapair .lbl{order:3;display:flex;align-items:baseline;gap:9px;flex:none;
+  justify-content:center;margin-top:11px}
+.bapair .lbl h3{font-size:clamp(13px,1.15vw,16.5px);font-weight:800;
+  letter-spacing:-.015em;color:var(--tx)}
 .bapair .lbl span{font-family:var(--mono);font-size:9px;letter-spacing:.14em;
   text-transform:uppercase;color:var(--tx3)}
-.bashots{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
-  gap:clamp(8px,.9vw,14px);margin-top:12px}
+.bashots{flex:1;min-height:0;display:flex;align-items:stretch;justify-content:center;
+  gap:clamp(6px,.8vw,14px);order:1}
+.bashots .shot{flex:1 1 0;min-width:0}
+.bashots .shot.after{flex-grow:1.3}
+/* the old screen is the reference point, so it sits smaller and quieter
+   than the new one beside it */
+.ba .shot.before img,.ba .shot.before video{max-height:78%;opacity:.45}
+.ba .shot.before .fr.empty{max-height:78%;opacity:.45;align-self:end}
+.ba .shot.before .cap{opacity:.55}
 /* a grid row of 1fr hands the frame a definite height, so an empty frame can
    derive its width from the aspect ratio — a flex column leaves the height
    indefinite and the frame stretches to the full column instead */
@@ -386,7 +405,6 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .shot.after .fr img,.shot.after .fr video{border-color:rgba(254,238,0,.34);
   box-shadow:0 18px 44px rgba(0,0,0,.45)}
 .shot.after .fr.empty{border-style:solid;border-color:rgba(254,238,0,.34)}
-.baarrow{flex:none;color:var(--tx3);display:grid;place-items:center;opacity:.6}
 .banote{flex:none;margin-top:11px;font-size:11.5px;line-height:1.5;color:var(--tx3)}
 
 /* ==================================================================== */
@@ -537,11 +555,26 @@ const PANELS = {
     { title:'Digital Card Fresh Look', tagline:'The rebuilt experience',
       layout:'screens',
       screens:[
-        { img:'assets/after-1.png', cap:'Digital Cards home', after:true },
-        { img:'assets/after-2.png', cap:'Brand & card page', after:true },
-        { img:'assets/after-3.png', cap:'Cart', after:true },
-        { img:'assets/after-4.png', cap:'Order placed', after:true },
-        { cap:'Walkthrough', hint:'video goes here', after:true }
+        /* the walkthrough is the hero here, so it carries more of the row
+           than the stills beside it */
+        { img:'assets/walkthrough.mp4', cap:'Walkthrough', after:true, w:1.35 },
+        { img:'assets/after-1.png', cap:'Digital Cards home', after:true, small:true },
+        { img:'assets/after-2.png', cap:'Brand & card page', after:true, small:true },
+        { img:'assets/after-3.png', cap:'Cart',              after:true, small:true },
+        { img:'assets/after-4.png', cap:'Order placed',      after:true, small:true }
+      ] },
+
+    { title:'Old vs New', tagline:'The same four moments, side by side',
+      layout:'beforeafter',
+      pairs:[
+        { t:'Homepage',
+          before:{ img:'assets/before-1.png' }, after:{ img:'assets/after-1.png' } },
+        { t:'Product Detail',
+          before:{ img:'assets/before-3.png' }, after:{ img:'assets/after-2.png' } },
+        { t:'Cart & Checkout',
+          before:{ img:'assets/before-4.png' }, after:{ img:'assets/after-3.png' } },
+        { t:'Order Confirmation',
+          before:{ img:'assets/before-5.png' }, after:{ img:'assets/after-4.png' } }
       ] }
   ],
 
@@ -630,9 +663,6 @@ function shead(p){
   </div>`;
 }
 
-const ARROW = `<span class="baarrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-  stroke="currentColor" stroke-width="2.2"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>`;
-
 function bodyBeforeAfter(p){
   const dev = p.device === 'web' ? ' web' : '';
   return `<div class="ba">${p.pairs.map(pr=>`
@@ -641,7 +671,6 @@ function bodyBeforeAfter(p){
       <div class="bashots">
         <div class="shot before${dev}"><div class="${frCls(pr.before)}">${frame(pr.before,'before screen',false)}</div>
           <span class="cap">${esc((pr.before||{}).cap||'Before')}</span></div>
-        ${ARROW}
         <div class="shot after${dev}"><div class="${frCls(pr.after)}">${frame(pr.after,'after screen',false)}</div>
           <span class="cap">${esc((pr.after||{}).cap||'After')}</span></div>
       </div>
@@ -654,7 +683,7 @@ function bodyBeforeAfter(p){
 function bodyScreens(p){
   const dev = p.device === 'web' ? ' web' : '';
   return `<div class="screens">${(p.screens||[]).map(sc=>`
-    <div class="shot${dev}${sc.after?' after':''}">
+    <div class="shot${dev}${sc.after?' after':''}${sc.small?' sm':''}" style="flex-grow:${sc.w||1}">
       <div class="${frCls(sc)}">${frame(sc, sc.hint||'screen', false)}</div>
       <span class="cap">${esc(sc.cap||'')}</span>
     </div>`).join('')}</div>`;
@@ -762,12 +791,44 @@ function bindPanel(){
 
 function go(sec){ state.sec = sec; render(); }
 
+/* The browser's own smooth scroll is short and abrupt, which reads badly
+   when a slide is mostly one big image. This eases the move in and out over
+   half a second instead, and the arriving slide settles its content as it
+   lands. */
+let slideAnim = null;
+function easeInOut(t){ return t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2; }
+function glideTo(left, dur){
+  if (slideAnim) cancelAnimationFrame(slideAnim);
+  const from = rail.scrollLeft, delta = left - from;
+  if (Math.abs(delta) < 1){ rail.scrollLeft = left; return; }
+  const t0 = performance.now();
+  rail.style.scrollSnapType = 'none';        /* snapping fights a JS tween */
+  (function frame(now){
+    const t = Math.min(1, (now - t0) / dur);
+    rail.scrollLeft = from + delta * easeInOut(t);
+    if (t < 1) slideAnim = requestAnimationFrame(frame);
+    else { slideAnim = null; rail.style.scrollSnapType = ''; }
+  })(t0);
+}
+
 function scrollToIndex(i, smooth=true){
   if (!panels.length) return;
   i = Math.max(0, Math.min(panels.length-1, i));
+  const moving = i !== index;
   index = i;
-  rail.scrollTo({ left: panels[i].offsetLeft, behavior: smooth?'smooth':'auto' });
+  const left = panels[i].offsetLeft;
+  if (smooth) glideTo(left, 520);
+  else rail.scrollTo({ left, behavior:'auto' });
+  if (smooth && moving) settle(panels[i]);
   syncNav();
+}
+
+/* the arriving slide lifts its content into place just as the scroll ends */
+function settle(panel){
+  panel.classList.remove('settle');
+  void panel.offsetWidth;                    /* restart the animation */
+  panel.classList.add('settle');
+  setTimeout(() => panel.classList.remove('settle'), 900);
 }
 function step(n){
   const t = index + n, si = SEC_ORDER.indexOf(state.sec);
