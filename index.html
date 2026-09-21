@@ -142,7 +142,7 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .srcchip.all .nm{letter-spacing:.1em;font-family:var(--mono);font-size:10px;text-transform:uppercase}
 .jtoggle{flex:none;display:flex;gap:5px}
 .rail{position:absolute;inset:0;display:flex;align-items:stretch;
-  overflow-x:auto;overflow-y:hidden;scroll-behavior:smooth;
+  overflow-x:auto;overflow-y:hidden;
   scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
 .rail::-webkit-scrollbar{display:none}
 .rail.grabbing{scroll-behavior:auto;cursor:grabbing}
@@ -159,12 +159,6 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
   line-height:1.45;letter-spacing:.01em}
 .sticky b{display:block;font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
   opacity:.55;margin-bottom:5px}
-
-/* a slide arriving under the eased scroll lifts its content the last few
-   pixels, so the move finishes rather than stops */
-@keyframes settleIn{ from{opacity:.55;transform:translateY(14px)} to{opacity:1;transform:none} }
-.panel.settle > *{animation:settleIn .42s cubic-bezier(.22,.9,.24,1) .3s both}
-@media (prefers-reduced-motion:reduce){ .panel.settle > *{animation:none} }
 
 /* ==================================================================== */
 /*  BOTTOM BAR                                                         */
@@ -352,6 +346,9 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .screens .shot{flex:1 1 0;min-width:0}
 /* a supporting still steps down so the hero beside it clearly leads */
 .screens .shot.sm img,.screens .shot.sm video{max-height:76%}
+/* the recording is letterboxed into whatever room is left, so no part of
+   the mock is ever cut off, and it stops short of the slide edges */
+.screens .shot.vid video{max-height:94%;object-fit:contain}
 .screens .fr.empty{justify-self:stretch;width:100%;height:auto;align-self:end}
 @media (max-width:900px){ .screens{overflow-x:auto;justify-content:flex-start} }
 
@@ -360,10 +357,19 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 /* ==================================================================== */
 .ba{flex:1;min-height:0;display:flex;gap:clamp(12px,1.6vw,30px);align-items:stretch}
 @media (max-width:900px){ .ba{overflow-x:auto} }
-/* no card around a pair — the screens themselves carry the slide, and the
-   dividers between pairs keep the four groups legible */
+/* no card and no divider around a pair — the highlight box at the top of
+   each column is what separates the four groups */
 .bapair{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end}
-.bapair + .bapair{border-left:1px solid var(--ln);padding-left:clamp(12px,1.6vw,30px)}
+/* a wrapping highlight must not sit lower than its neighbours, so every
+   box holds the same height whether its line wraps or not */
+.keybox{order:0;flex:none;display:flex;align-items:center;gap:9px;
+  min-height:clamp(48px,6.4vh,60px);
+  margin-bottom:clamp(12px,2vh,22px);padding:10px 13px;border-radius:13px;
+  background:var(--card);border:1px solid var(--ln)}
+.keybox i{flex:none;display:grid;place-items:center;width:18px;height:18px;
+  border-radius:50%;background:var(--y);color:var(--ink);margin-top:1px}
+.keybox span{font-size:clamp(11.5px,.95vw,13.5px);font-weight:600;line-height:1.35;
+  letter-spacing:-.005em;color:var(--tx2)}
 /* the title sits under its pair rather than floating at the top of the
    slide — screens, their before/after tags, then the moment they show */
 .bapair .lbl{order:3;display:flex;align-items:baseline;gap:9px;flex:none;
@@ -555,25 +561,25 @@ const PANELS = {
     { title:'Digital Card Fresh Look', tagline:'The rebuilt experience',
       layout:'screens',
       screens:[
-        /* the walkthrough is the hero here, so it carries more of the row
-           than the stills beside it */
-        { img:'assets/walkthrough.mp4', cap:'Walkthrough', after:true, w:1.35 },
         { img:'assets/after-1.png', cap:'Digital Cards home', after:true, small:true },
         { img:'assets/after-2.png', cap:'Brand & card page', after:true, small:true },
         { img:'assets/after-3.png', cap:'Cart',              after:true, small:true },
-        { img:'assets/after-4.png', cap:'Order placed',      after:true, small:true }
+        { img:'assets/after-4.png', cap:'Order placed',      after:true, small:true },
+        /* the walkthrough closes the row on the right, sized so the whole
+           recording is on screen rather than running past the slide */
+        { img:'assets/walkthrough.mp4', cap:'Walkthrough', after:true, w:1.3, video:true }
       ] },
 
     { title:'Old vs New', tagline:'The same four moments, side by side',
       layout:'beforeafter',
       pairs:[
-        { t:'Homepage',
+        { t:'Homepage', key:'More Visual Focused Assets',
           before:{ img:'assets/before-1.png' }, after:{ img:'assets/after-1.png' } },
-        { t:'Product Detail',
+        { t:'Product Detail', key:'Instant Delivery Highlight &amp; Reinforcement',
           before:{ img:'assets/before-3.png' }, after:{ img:'assets/after-2.png' } },
-        { t:'Cart & Checkout',
+        { t:'Cart & Checkout', key:'Multi Card Checkout',
           before:{ img:'assets/before-4.png' }, after:{ img:'assets/after-3.png' } },
-        { t:'Order Confirmation',
+        { t:'Order Confirmation', key:'Clear Redemption Steps',
           before:{ img:'assets/before-5.png' }, after:{ img:'assets/after-4.png' } }
       ] }
   ],
@@ -663,10 +669,15 @@ function shead(p){
   </div>`;
 }
 
+const TICK = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+  stroke="currentColor" stroke-width="3.4" stroke-linecap="round"
+  stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg>`;
+
 function bodyBeforeAfter(p){
   const dev = p.device === 'web' ? ' web' : '';
   return `<div class="ba">${p.pairs.map(pr=>`
     <div class="bapair">
+      ${pr.key ? `<div class="keybox"><i>${TICK}</i><span>${pr.key}</span></div>` : ''}
       <div class="lbl"><h3>${esc(pr.t)}</h3>${pr.s?`<span>${esc(pr.s)}</span>`:''}</div>
       <div class="bashots">
         <div class="shot before${dev}"><div class="${frCls(pr.before)}">${frame(pr.before,'before screen',false)}</div>
@@ -683,7 +694,7 @@ function bodyBeforeAfter(p){
 function bodyScreens(p){
   const dev = p.device === 'web' ? ' web' : '';
   return `<div class="screens">${(p.screens||[]).map(sc=>`
-    <div class="shot${dev}${sc.after?' after':''}${sc.small?' sm':''}" style="flex-grow:${sc.w||1}">
+    <div class="shot${dev}${sc.after?' after':''}${sc.small?' sm':''}${sc.video?' vid':''}" style="flex-grow:${sc.w||1}">
       <div class="${frCls(sc)}">${frame(sc, sc.hint||'screen', false)}</div>
       <span class="cap">${esc(sc.cap||'')}</span>
     </div>`).join('')}</div>`;
@@ -791,49 +802,19 @@ function bindPanel(){
 
 function go(sec){ state.sec = sec; render(); }
 
-/* The browser's own smooth scroll is short and abrupt, which reads badly
-   when a slide is mostly one big image. This eases the move in and out over
-   half a second instead, and the arriving slide settles its content as it
-   lands. */
-let slideAnim = null;
-function easeInOut(t){ return t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2; }
-function glideTo(left, dur){
-  if (slideAnim) cancelAnimationFrame(slideAnim);
-  const from = rail.scrollLeft, delta = left - from;
-  if (Math.abs(delta) < 1){ rail.scrollLeft = left; return; }
-  const t0 = performance.now();
-  rail.style.scrollSnapType = 'none';        /* snapping fights a JS tween */
-  (function frame(now){
-    const t = Math.min(1, (now - t0) / dur);
-    rail.scrollLeft = from + delta * easeInOut(t);
-    if (t < 1) slideAnim = requestAnimationFrame(frame);
-    else { slideAnim = null; rail.style.scrollSnapType = ''; }
-  })(t0);
-}
-
-function scrollToIndex(i, smooth=true){
+/* slides cut straight across — no tween, no animation on arrival */
+function scrollToIndex(i){
   if (!panels.length) return;
   i = Math.max(0, Math.min(panels.length-1, i));
-  const moving = i !== index;
   index = i;
-  const left = panels[i].offsetLeft;
-  if (smooth) glideTo(left, 520);
-  else rail.scrollTo({ left, behavior:'auto' });
-  if (smooth && moving) settle(panels[i]);
+  rail.scrollTo({ left: panels[i].offsetLeft, behavior:'auto' });
   syncNav();
 }
 
-/* the arriving slide lifts its content into place just as the scroll ends */
-function settle(panel){
-  panel.classList.remove('settle');
-  void panel.offsetWidth;                    /* restart the animation */
-  panel.classList.add('settle');
-  setTimeout(() => panel.classList.remove('settle'), 900);
-}
 function step(n){
   const t = index + n, si = SEC_ORDER.indexOf(state.sec);
   if (t < 0){                                   /* off the front → previous section */
-    if (si > 0){ go(SEC_ORDER[si-1]); scrollToIndex(panels.length-1, false); }
+    if (si > 0){ go(SEC_ORDER[si-1]); scrollToIndex(panels.length-1); }
     return;
   }
   if (t > panels.length-1){                     /* off the end → next section */
