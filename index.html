@@ -415,11 +415,22 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 /* ==================================================================== */
 .stackrow{flex:1;min-height:0;display:flex;align-items:stretch;
   gap:clamp(14px,2vw,34px)}
-.stackcol{flex:0 0 clamp(170px,16vw,250px);min-width:0;display:flex;
-  flex-direction:column;gap:clamp(8px,1.4vh,18px)}
+.flowcol{min-height:0;display:flex;flex-direction:column;gap:9px}
+.flowcol.old{flex:0 0 clamp(170px,16vw,250px)}
+/* the rule is what separates the two flows */
+.flowcol.new{flex:1 1 auto;min-width:0;border-left:1px solid var(--ln);
+  padding-left:clamp(14px,2vw,34px)}
+.flowlbl{flex:none;font-family:var(--mono);font-size:10px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--tx3)}
+.flowlbl.on{color:var(--y)}
+.stackcol{flex:1;min-height:0;min-width:0;display:flex;
+  flex-direction:column;gap:clamp(6px,1.1vh,14px)}
 .stackcol .shot{flex:1 1 0;min-height:0;justify-content:center}
-.stackrow .shot.hero{flex:1 1 auto;min-width:0;justify-content:center}
-@media (max-width:900px){ .stackrow{flex-direction:column} }
+.flowcol.new .shot.hero{flex:1 1 auto;min-height:0;justify-content:center}
+/* the recording steps back a little from the full height */
+.shot.hero{--scale:.88}
+@media (max-width:900px){ .stackrow{flex-direction:column}
+  .flowcol.new{border-left:0;padding-left:0;border-top:1px solid var(--ln);padding-top:14px} }
 
 /* ==================================================================== */
 /*  SPLIT — a single frame beside a list of points                      */
@@ -596,12 +607,14 @@ const PANELS = {
     { title:'Web Experience', tagline:'The card journey on web',
       tag:'Placeholder', layout:'stack',
       /* one slot per point, waiting on its mock */
+      oldLabel:'Old Flow', newLabel:'Revamped Flow',
       items:[
-        { img:'assets/web-old-1.png', cap:'Old · Landing page' },
-        { img:'assets/web-old-2.png', cap:'Old · Brand page' },
-        { img:'assets/web-old-3.png', cap:'Old · Card page' }
+        { img:'assets/web-old-1.png', cap:'Landing page' },
+        { img:'assets/web-old-2.png', cap:'Brand page' },
+        { img:'assets/web-old-3.png', cap:'Card page' },
+        { img:'assets/web-old-4.png', cap:'Checkout' }
       ],
-      hero:{ img:'assets/web-walkthrough.mp4', cap:'New · Walkthrough' } }
+      hero:{ img:'assets/web-walkthrough.mp4', cap:'Walkthrough' } }
   ],
 
   functional: [
@@ -717,8 +730,14 @@ function bodyStack(p){
       <span class="cap">${esc(sc.cap||'')}</span>
     </div>`;
   return `<div class="stackrow">
-    <div class="stackcol">${(p.items||[]).map(it => shot(it, 'sm')).join('')}</div>
-    ${p.hero ? shot(p.hero, 'hero') : ''}
+    <div class="flowcol old">
+      <span class="flowlbl">${esc(p.oldLabel||'Old')}</span>
+      <div class="stackcol">${(p.items||[]).map(it => shot(it, 'sm')).join('')}</div>
+    </div>
+    <div class="flowcol new">
+      <span class="flowlbl on">${esc(p.newLabel||'New')}</span>
+      ${p.hero ? shot(p.hero, 'hero') : ''}
+    </div>
   </div>`;
 }
 
