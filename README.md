@@ -18,7 +18,7 @@ Open `index.html` in any browser.
 2. **Fresh Look** — *Digital Cards Before* and *Digital Card Fresh Look*
 3. **Web Experience**
 4. **Functional Optimisations**
-5. **Performance** — *Pre-2025 · Fraud Cleanup* and *Post-2025 · Growth and the Revamp*
+5. **Performance** — *Phase 1 · Pre-2025: Security* and *Phase 2 · Post-2025: Growth and the Revamp*
 6. **End**
 
 ## Editing the content
