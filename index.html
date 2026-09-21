@@ -344,11 +344,9 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 /* equal cells keep every screen — and an empty slot waiting on an asset —
    the same width, so the row reads as one set */
 .screens .shot{flex:1 1 0;min-width:0}
-/* a supporting still steps down so the hero beside it clearly leads */
-.screens .shot.sm img,.screens .shot.sm video{max-height:76%}
-/* the recording is letterboxed into whatever room is left, so no part of
-   the mock is ever cut off, and it stops short of the slide edges */
-.screens .shot.vid video{max-height:94%;object-fit:contain}
+/* a supporting still steps down so the recording beside it clearly leads */
+.screens .shot.sm{--scale:.72}
+.screens .shot.vid{--scale:.92}
 .screens .fr.empty{justify-self:stretch;width:100%;height:auto;align-self:end}
 @media (max-width:900px){ .screens{overflow-x:auto;justify-content:flex-start} }
 
@@ -362,9 +360,9 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .bapair{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end}
 /* a wrapping highlight must not sit lower than its neighbours, so every
    box holds the same height whether its line wraps or not */
-.keybox{order:0;flex:none;display:flex;align-items:center;gap:9px;
+.keybox{order:4;flex:none;display:flex;align-items:center;gap:9px;
   min-height:clamp(48px,6.4vh,60px);
-  margin-bottom:clamp(12px,2vh,22px);padding:10px 13px;border-radius:13px;
+  margin-top:11px;padding:10px 13px;border-radius:13px;
   background:var(--card);border:1px solid var(--ln)}
 .keybox i{flex:none;display:grid;place-items:center;width:18px;height:18px;
   border-radius:50%;background:var(--y);color:var(--ink);margin-top:1px}
@@ -384,33 +382,30 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .bashots .shot.after{flex-grow:1.3}
 /* the old screen is the reference point, so it sits smaller and quieter
    than the new one beside it */
-.ba .shot.before img,.ba .shot.before video{max-height:78%;opacity:.45}
-.ba .shot.before .fr.empty{max-height:78%;opacity:.45;align-self:end}
+.ba .shot.before{--scale:.78}
+.ba .shot.before .fr{opacity:.45}
 .ba .shot.before .cap{opacity:.55}
-/* a grid row of 1fr hands the frame a definite height, so an empty frame can
-   derive its width from the aspect ratio — a flex column leaves the height
-   indefinite and the frame stretches to the full column instead */
-.shot{height:100%;min-width:0;display:grid;grid-template-rows:minmax(0,1fr) auto;
-  gap:7px;justify-items:center}
-/* The screenshot keeps its own proportions — it is never cropped to a frame
-   shape or stretched to fill one. The border therefore sits on the image
-   itself rather than on the cell, and the cell bottom-aligns it so the
-   caption always sits directly beneath the screen. */
-.shot .fr{height:100%;max-width:100%;display:grid;place-items:end center}
-.shot .fr img,.shot .fr video{max-height:100%;max-width:100%;height:auto;width:auto;
-  display:block;cursor:zoom-in;border-radius:18px;
-  border:1.5px solid rgba(255,255,255,.10)}
-/* only an empty frame needs a shape of its own */
-.shot .fr.empty{width:auto;aspect-ratio:9/19.5;overflow:hidden;place-items:stretch;
-  border-radius:20px;border:1.5px dashed var(--ln2);background:rgba(255,255,255,.03)}
-.shot.web .fr.empty{aspect-ratio:16/10;border-radius:12px}
+/* CSS alone cannot fit a screen to both the room above it and the room
+   beside it without either cropping it or letterboxing it inside a border,
+   so fitShots() measures each cell and sizes the frame in pixels from the
+   asset's own proportions. --scale is how much of the available height a
+   given screen may take. */
+.shot{--scale:1;height:100%;min-width:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-end;gap:7px}
+.shot .fr{flex:none;max-width:100%;overflow:hidden;display:grid;place-items:center;
+  border-radius:18px;border:1.5px solid rgba(255,255,255,.10)}
+.shot .fr img,.shot .fr video{width:100%;height:100%;object-fit:contain;
+  display:block;cursor:zoom-in}
+/* a frame still waiting on its asset keeps the shape of a phone screen */
+.shot .fr.empty{border-style:dashed;border-color:var(--ln2);
+  background:rgba(255,255,255,.03);border-radius:20px}
+.shot.web .fr.empty{border-radius:12px}
 .shot .cap{flex:none;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;color:var(--tx3);text-align:center;line-height:1.3}
 .shot.before .cap{color:var(--tx3)}
 .shot.after .cap{color:var(--y)}
-.shot.after .fr img,.shot.after .fr video{border-color:rgba(254,238,0,.34);
-  box-shadow:0 18px 44px rgba(0,0,0,.45)}
-.shot.after .fr.empty{border-style:solid;border-color:rgba(254,238,0,.34)}
+.shot.after .fr{border-color:rgba(254,238,0,.34);box-shadow:0 18px 44px rgba(0,0,0,.45)}
+.shot.after .fr.empty{border-style:solid}
 .banote{flex:none;margin-top:11px;font-size:11.5px;line-height:1.5;color:var(--tx3)}
 
 /* ==================================================================== */
@@ -677,8 +672,8 @@ function bodyBeforeAfter(p){
   const dev = p.device === 'web' ? ' web' : '';
   return `<div class="ba">${p.pairs.map(pr=>`
     <div class="bapair">
-      ${pr.key ? `<div class="keybox"><i>${TICK}</i><span>${pr.key}</span></div>` : ''}
       <div class="lbl"><h3>${esc(pr.t)}</h3>${pr.s?`<span>${esc(pr.s)}</span>`:''}</div>
+      ${pr.key ? `<div class="keybox"><i>${TICK}</i><span>${pr.key}</span></div>` : ''}
       <div class="bashots">
         <div class="shot before${dev}"><div class="${frCls(pr.before)}">${frame(pr.before,'before screen',false)}</div>
           <span class="cap">${esc((pr.before||{}).cap||'Before')}</span></div>
@@ -788,6 +783,8 @@ function render(){
   syncSecDrop();
   bindPanel();
   panels = $$('#rail > .panel');
+  fitShots();
+  requestAnimationFrame(fitShots);      /* again once fonts and layout settle */
   index = 0;
   rail.scrollTo({ left:0, behavior:'auto' });
   syncNav();
@@ -801,6 +798,41 @@ function bindPanel(){
 }
 
 function go(sec){ state.sec = sec; render(); }
+
+/* Size every screen to the room its cell actually has. A screen is capped
+   by the height left above its caption and by the width of its column,
+   whichever runs out first, so nothing is ever cut off by the slide edge —
+   and because the frame ends up at the asset's own proportions, the border
+   hugs the screen instead of floating around a letterboxed one. */
+function fitShots(){
+  $$('#rail .shot').forEach(shot => {
+    const fr = shot.querySelector('.fr');
+    if (!fr) return;
+    const media = fr.querySelector('img,video');
+    const mw = media ? (media.naturalWidth  || media.videoWidth)  : 0;
+    const mh = media ? (media.naturalHeight || media.videoHeight) : 0;
+    const ar = (mw && mh) ? mw/mh : (shot.classList.contains('web') ? 16/10 : 9/19.5);
+    const cap = shot.querySelector('.cap');
+    const gap = parseFloat(getComputedStyle(shot).rowGap) || 0;
+    const availH = shot.clientHeight - (cap ? cap.offsetHeight + gap : 0);
+    const availW = shot.clientWidth;
+    if (availH <= 0 || availW <= 0) return;
+    const scale = parseFloat(getComputedStyle(shot).getPropertyValue('--scale')) || 1;
+    const h = Math.min(availH * scale, availW / ar);
+    fr.style.height = Math.floor(h) + 'px';
+    fr.style.width  = Math.floor(h * ar) + 'px';
+  });
+}
+
+let fitTick;
+function fitSoon(){ cancelAnimationFrame(fitTick); fitTick = requestAnimationFrame(fitShots); }
+/* an asset reports its size only once it has loaded, so refit on arrival */
+document.addEventListener('load', e => { if (e.target.tagName === 'IMG') fitSoon(); }, true);
+document.addEventListener('loadedmetadata', e => {
+  if (e.target.tagName !== 'VIDEO') return;
+  fitSoon();
+  e.target.play().catch(()=>{});      /* autoplay is refused in a background tab */
+}, true);
 
 /* slides cut straight across — no tween, no animation on arrival */
 function scrollToIndex(i){
@@ -936,8 +968,9 @@ function syncSecDrop(){
 }
 
 let rz;
-window.addEventListener('resize', ()=>{ clearTimeout(rz); rz = setTimeout(syncNav, 90); });
-window.addEventListener('load', syncNav);
+window.addEventListener('resize', ()=>{ clearTimeout(rz); rz = setTimeout(()=>{ fitShots(); syncNav(); }, 90); });
+window.addEventListener('load', ()=>{ fitShots(); syncNav(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitShots);
 
 buildSecDrop();
 (function(){
