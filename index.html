@@ -358,7 +358,7 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 @media (max-width:900px){ .ba{overflow-x:auto} }
 /* no card and no divider around a pair — the highlight box at the top of
    each column is what separates the four groups */
-.bapair{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end}
+.bapair{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
 /* a wrapping highlight must not sit lower than its neighbours, so every
    box holds the same height whether its line wraps or not */
 .keybox{order:4;flex:none;display:flex;align-items:center;gap:9px;
@@ -377,7 +377,7 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
   letter-spacing:-.015em;color:var(--tx)}
 .bapair .lbl span{font-family:var(--mono);font-size:9px;letter-spacing:.14em;
   text-transform:uppercase;color:var(--tx3)}
-.bashots{flex:1;min-height:0;display:flex;align-items:stretch;justify-content:center;
+.bashots{flex:1 1 auto;min-height:0;display:flex;align-items:stretch;justify-content:center;
   gap:clamp(6px,.8vw,14px);order:1}
 .bashots .shot{flex:1 1 0;min-width:0}
 .bashots .shot.after{flex-grow:1.3}
@@ -393,20 +393,21 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
    given screen may take. */
 .shot{--scale:1;height:100%;min-width:0;display:flex;flex-direction:column;
   align-items:center;justify-content:flex-end;gap:7px}
+/* corner-shape rounds the way a device does — a squircle rather than a
+   plain arc — and a browser without it falls back to the same radius,
+   which fitShots() sets in proportion to how wide the screen is drawn */
 .shot .fr{flex:none;max-width:100%;overflow:hidden;display:grid;place-items:center;
-  border-radius:18px;border:1.5px solid rgba(255,255,255,.10)}
+  corner-shape:squircle;box-shadow:0 18px 44px rgba(0,0,0,.45)}
 .shot .fr img,.shot .fr video{width:100%;height:100%;object-fit:contain;
   display:block;cursor:zoom-in}
 /* a frame still waiting on its asset keeps the shape of a phone screen */
-.shot .fr.empty{border-style:dashed;border-color:var(--ln2);
-  background:rgba(255,255,255,.03);border-radius:20px}
-.shot.web .fr.empty{border-radius:12px}
+.shot .fr.empty{border:1.5px dashed var(--ln2);
+  background:rgba(255,255,255,.03);box-shadow:none}
 .shot .cap{flex:none;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;color:var(--tx3);text-align:center;line-height:1.3}
 .shot.before .cap{color:var(--tx3)}
 .shot.after .cap{color:var(--y)}
-.shot.after .fr{border-color:rgba(254,238,0,.34);box-shadow:0 18px 44px rgba(0,0,0,.45)}
-.shot.after .fr.empty{border-style:solid}
+.shot.after .fr.empty{border-color:rgba(254,238,0,.34)}
 .banote{flex:none;margin-top:11px;font-size:11.5px;line-height:1.5;color:var(--tx3)}
 
 /* ==================================================================== */
@@ -422,8 +423,8 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
    screen is height-led, so it takes the slide height and keeps 9:19.5 */
 .splitmedia .fr{max-width:100%;max-height:100%;align-self:center;
   display:grid;place-items:center}
-.splitmedia .fr img,.splitmedia .fr video{border-radius:12px;
-  border:1.5px solid rgba(255,255,255,.10)}
+.splitmedia .fr img,.splitmedia .fr video{border-radius:16px;corner-shape:squircle;
+  box-shadow:0 18px 44px rgba(0,0,0,.45)}
 .splitmedia .fr.empty{width:100%;height:100%;overflow:hidden;border-radius:20px;
   border:1.5px dashed var(--ln2);background:rgba(255,255,255,.03)}
 .splitmedia.phone .fr.empty{width:auto;aspect-ratio:9/19.5}
@@ -806,6 +807,9 @@ function go(sec){ state.sec = sec; render(); }
    and because the frame ends up at the asset's own proportions, the border
    hugs the screen instead of floating around a letterboxed one. */
 function fitShots(){
+  /* clear what the last pass set, or each run would measure the room the
+     previous run had already shrunk */
+  $$('#rail .bashots').forEach(row => { row.style.height = ''; row.style.flexGrow = ''; });
   $$('#rail .shot').forEach(shot => {
     const fr = shot.querySelector('.fr');
     if (!fr) return;
@@ -820,8 +824,26 @@ function fitShots(){
     if (availH <= 0 || availW <= 0) return;
     const scale = parseFloat(getComputedStyle(shot).getPropertyValue('--scale')) || 1;
     const h = Math.min(availH * scale, availW / ar);
+    const w = Math.floor(h * ar);
     fr.style.height = Math.floor(h) + 'px';
-    fr.style.width  = Math.floor(h * ar) + 'px';
+    fr.style.width  = w + 'px';
+    /* a device's corner is a fixed share of its width, so the radius has to
+       follow the size the screen ends up at */
+    fr.style.borderRadius = Math.round(w * (shot.classList.contains('web') ? .025 : .08)) + 'px';
+  });
+
+  /* a before/after row is as tall as its tallest screen plus its captions,
+     so the pair sits in the middle of the slide instead of at the foot of
+     a row stretched to the full height */
+  $$('#rail .bashots').forEach(row => {
+    const shots = [...row.querySelectorAll('.shot')];
+    if (!shots.length) return;
+    const tall = Math.max(...shots.map(sh => {
+      const fr = sh.querySelector('.fr'), cap = sh.querySelector('.cap');
+      const gap = parseFloat(getComputedStyle(sh).rowGap) || 0;
+      return (fr ? fr.offsetHeight : 0) + (cap ? cap.offsetHeight + gap : 0);
+    }));
+    if (tall > 0){ row.style.height = Math.ceil(tall) + 'px'; row.style.flexGrow = '0'; }
   });
 }
 
