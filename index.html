@@ -416,6 +416,10 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
   background:rgba(255,255,255,.03);box-shadow:none}
 .shot .cap{flex:none;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;color:var(--tx3);text-align:center;line-height:1.3}
+/* on a row of screens the caption sits above the screen it names, larger
+   and with room between the two */
+.screens .shot .cap{order:-1;margin-bottom:clamp(7px,1.1vh,14px);
+  font-size:clamp(11px,.92vw,13px);letter-spacing:.12em;color:var(--tx2)}
 .shot.before .cap{color:var(--tx3)}
 .shot.after .cap{color:var(--y)}
 .shot.after .fr.empty{border-color:rgba(254,238,0,.34)}
@@ -1184,7 +1188,8 @@ function fitShots(){
     const ar = (mw && mh) ? mw/mh : (shot.classList.contains('web') ? 16/10 : 9/19.5);
     const cap = shot.querySelector('.cap');
     const gap = parseFloat(getComputedStyle(shot).rowGap) || 0;
-    const availH = shot.clientHeight - (cap ? cap.offsetHeight + gap : 0);
+    const capM = cap ? (parseFloat(getComputedStyle(cap).marginBottom) || 0) : 0;
+    const availH = shot.clientHeight - (cap ? cap.offsetHeight + capM + gap : 0);
     const availW = shot.clientWidth;
     if (availH <= 0 || availW <= 0) return;
     const scale = parseFloat(getComputedStyle(shot).getPropertyValue('--scale')) || 1;
