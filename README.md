@@ -21,6 +21,19 @@ Open `index.html` in any browser.
 5. **Performance** — *Phase 1 · Pre-2025: Security* and *Phase 2 · Post-2025: Growth and Revamp*
 6. **End**
 
+## Deploying it
+
+`python3 build-deploy.py` writes two copies into `deploy/`:
+
+| File | What it is | Size |
+| --- | --- | --- |
+| `index.html` + `assets/` | every image inside the page, the two recordings beside it | ~11MB + 36MB |
+| `index-standalone.html` | the whole deck in one file, recordings included | ~59MB |
+
+Upload either to any static host — there is nothing to build or serve.
+Images are re-encoded to JPEG and the recordings to a lighter preset for
+the web; the originals in `assets/` stay untouched as the masters.
+
 ## Editing the content
 
 Everything the deck says lives in one block at the top of the `<script>` in

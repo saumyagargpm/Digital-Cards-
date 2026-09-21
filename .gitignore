@@ -1,3 +1,6 @@
 node_modules/
 .DS_Store
 _preview.html
+_deploycheck.html
+deploy/
+deploy-bundle.zip
