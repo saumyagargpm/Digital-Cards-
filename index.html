@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital Card Experience Revamp — noon</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTE2IiBoZWlnaHQ9IjExMyIgdmlld0JveD0iMCAwIDExNiAxMTMiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMTYiIGhlaWdodD0iMTEzIiByeD0iMjUiIGZpbGw9ImJsYWNrIi8+CjxwYXRoIGQ9Ik0xNy40NDYzIDU4LjM5NTlDMTcuNDQ2MyA3OS44NDExIDM2LjAyNDYgOTYuNSA1Ny42MjAxIDk2LjVDODAuMjI5MyA5Ni41IDk4LjU1NDIgNzguNjA1NyA5OC41NTQyIDU2Ljc0ODZDOTguNTU0MiA0My45NjcgOTIuMjUwNiAzMi43NDcxIDgyLjkyMTggMjUuMjQ5TDc2LjExMTQgMzYuNzk1M0M4MS43NDE5IDQxLjQ5NjEgODUuNjA2NCA0OC43NTMzIDg1LjYwNjQgNTYuOTE5NkM4NS42MDY0IDcxLjc2MDMgNzMuMDg2MiA4My45NjcgNTcuNjIwMSA4My45NjdDNDIuMjQxMiA4My45NjcgMjkuNzEzMSA3MS43NjAzIDI5LjcxMzEgNTYuNTA3OEMyOS43MTMxIDU0LjY4OTYgMjkuODc5NCA1Mi44NzkyIDMwLjIxOTkgNTEuMTQ2NUwxNy40NDYzIDU4LjM5NTlaTTcwLjIyNzQgMTguNDgxNEM2Ni4zNjI5IDE3LjA3NSA2Mi45MTgxIDE2LjUgNTkuNDczMiAxNi41QzU2Ljg2NzggMTYuNSA1NC41OTUgMTYuODI2MyA1Mi45MTYyIDE3LjE2MDVMNDQuMTczNCAzMi4wMDEyQzQ3LjM2NDggMzAuMTkwOCA1MS40ODI4IDI5LjE5NjIgNTUuOTQxMyAyOS4xOTYyQzU4LjU0NjcgMjkuMTk2MiA2MC44OTg3IDI5LjUyMjUgNjMuMzM3OCAzMC4xODNMNzAuMjI3NCAxOC40ODE0WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==">
+<style>
+/* ==================================================================== */
+/*  NOON AFTER DARK — tokens lifted from the Consumer Product Update deck */
+/* ==================================================================== */
+:root{
+  --y:#FEEE00; --ink:#101114; --bg:#0B0C10; --bg2:#101218;
+  --tx:#F4F5F7; --tx2:rgba(244,245,247,.72); --tx3:rgba(244,245,247,.48);
+  --card:rgba(255,255,255,.045); --card2:rgba(255,255,255,.07);
+  --ln:rgba(255,255,255,.10); --ln2:rgba(255,255,255,.16);
+  --live:#57D9A3; --part:#5BC8DB; --prog:#5BC8DB; --soon:#FFC44D; --tbd:rgba(244,245,247,.4);
+  --coral:#F2766B; --gold:#D8A93E;
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --round:"Arial Rounded MT Bold","Helvetica Neue",Helvetica,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  --bot:54px;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{margin:0;color:var(--tx);font-family:var(--sans);font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;overscroll-behavior:none}
+h1,h2,h3,h4,p{margin:0;text-wrap:balance}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.hidden{display:none!important}
+::selection{background:rgba(254,238,0,.3);color:#fff}
+*{scrollbar-color:rgba(255,255,255,.18) transparent}
+input{color:var(--tx)} input::placeholder{color:var(--tx3)}
+
+/* ---- ambient glow, tinted per section ---- */
+.glow{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.9;transition:background 1s ease}
+.app[data-sec="cover"] .glow{background:
+  radial-gradient(58% 52% at 82% 12%,rgba(254,238,0,.075),transparent 60%),
+  radial-gradient(50% 55% at 10% 92%,rgba(94,141,239,.06),transparent 60%)}
+.app[data-sec="metrics"] .glow{background:
+  radial-gradient(58% 55% at 85% 10%,rgba(91,141,239,.10),transparent 62%),
+  radial-gradient(45% 50% at 8% 95%,rgba(254,238,0,.05),transparent 55%)}
+.app[data-sec="matrix"] .glow{background:
+  radial-gradient(58% 55% at 85% 10%,rgba(182,120,224,.09),transparent 62%),
+  radial-gradient(45% 50% at 8% 95%,rgba(254,238,0,.05),transparent 55%)}
+.app[data-sec="journey"] .glow{background:
+  radial-gradient(58% 55% at 85% 10%,rgba(87,217,163,.09),transparent 62%),
+  radial-gradient(45% 50% at 8% 95%,rgba(254,238,0,.05),transparent 55%)}
+.app[data-sec="insights"] .glow{background:
+  radial-gradient(58% 55% at 85% 10%,rgba(242,118,107,.09),transparent 62%),
+  radial-gradient(45% 50% at 8% 95%,rgba(254,238,0,.05),transparent 55%)}
+.grid-tex{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+  background-size:56px 56px;
+  -webkit-mask-image:radial-gradient(120% 95% at 20% 8%,#000,transparent 80%);
+  mask-image:radial-gradient(120% 95% at 20% 8%,#000,transparent 80%)}
+
+/* ---- shared dark type ---- */
+.d-kick{font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--y)}
+.d-title{font-size:clamp(28px,3.6vw,50px);font-weight:800;letter-spacing:-.035em;line-height:1;color:var(--tx)}
+.d-sub{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--tx3)}
+.k{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  padding:4px 10px;border-radius:99px;font-weight:700;white-space:nowrap}
+.k-live{background:rgba(87,217,163,.14);color:var(--live)}
+.k-soon{background:rgba(255,196,77,.13);color:var(--soon)}
+.k-part{background:rgba(91,200,219,.13);color:var(--part)}
+.k-tbd{background:rgba(255,255,255,.08);color:var(--tbd)}
+.k-major{background:var(--y);color:var(--ink);font-weight:800}
+.sq2{display:inline-block;font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;
+  text-transform:uppercase;background:rgba(255,255,255,.1);color:var(--tx2);padding:2.5px 7px;border-radius:5px}
+.ykey{display:inline-block;width:34px;height:6px;border-radius:3px;background:var(--y)}
+
+/* ==================================================================== */
+/*  SHELL                                                              */
+/* ==================================================================== */
+.app{height:100%;display:flex;flex-direction:column;position:relative;background:var(--bg)}
+.spacer{flex:1}
+
+.jtoggle button{padding:5px 12px;border-radius:99px;font-family:var(--mono);font-size:9.5px;
+  font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);
+  border:1px solid var(--ln2);background:transparent;transition:.15s;white-space:nowrap}
+.jtoggle button:hover{color:var(--tx);border-color:var(--tx3)}
+.jtoggle button.on{background:var(--y);border-color:var(--y);color:var(--ink);font-weight:800}
+.secdrop{position:relative;flex:none}
+.secdrop-btn{display:flex;align-items:center;gap:9px;height:32px;padding:0 13px;
+  border-radius:99px;border:1px solid var(--ln2);background:rgba(255,255,255,.04);
+  font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--y);transition:.15s;min-width:172px;justify-content:space-between}
+.secdrop-btn:hover{border-color:var(--y)}
+.secdrop-btn svg{transition:transform .2s;opacity:.7;flex:none}
+.secdrop.open .secdrop-btn{border-color:var(--y);background:rgba(254,238,0,.1)}
+.secdrop.open .secdrop-btn svg{transform:rotate(180deg)}
+.secdrop-list{position:absolute;bottom:calc(100% + 11px);right:0;min-width:236px;margin:0;padding:6px;
+  list-style:none;border-radius:14px;border:1px solid var(--ln2);
+  background:rgba(16,17,20,.96);backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:0 -22px 50px rgba(0,0,0,.65);z-index:60;
+  opacity:0;visibility:hidden;transform:translateY(6px);transition:.18s}
+.secdrop.open .secdrop-list{opacity:1;visibility:visible;transform:none}
+.secdrop-list li{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--tx2);padding:9px 12px;border-radius:9px;cursor:pointer;white-space:nowrap;
+  display:flex;align-items:center;gap:10px}
+.secdrop-list li:hover{background:rgba(255,255,255,.07);color:var(--tx)}
+.secdrop-list li[aria-selected="true"]{background:rgba(254,238,0,.12);color:var(--y);font-weight:700}
+.secdrop-list li .n{opacity:.5;font-size:9.5px;min-width:16px}
+
+
+.stage{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;z-index:5}
+.railwrap{flex:1;min-height:0;position:relative}
+.jbar{flex:none;display:flex;align-items:center;gap:14px;
+  padding:11px clamp(22px,3.4vw,52px);border-bottom:1px solid var(--ln);
+  background:rgba(255,255,255,.02)}
+/* the status filter sits on its own slim row beneath the view toggle, so the
+   top bar keeps room for the marketplace chips */
+.stbar{flex:none;display:flex;justify-content:flex-end;
+  padding:8px clamp(22px,3.4vw,52px);border-bottom:1px solid var(--ln)}
+.stbar.hidden{display:none}
+.stsw{flex:none;display:flex;align-items:center;gap:5px}
+.stsw .lbl{flex:none;font-family:var(--mono);font-size:8px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--tx3);margin-right:3px}
+.stsw .stchip{height:24px;padding:0 9px 0 7px;gap:5px;border-radius:99px}
+.stsw .stchip i{width:7px;height:7px;border-radius:50%}
+.stsw .stchip .nm{font-size:10px}
+.stsw .stchip .n{font-size:8px}
+.srcsw{display:flex;align-items:center;gap:6px;flex:1;min-width:0;
+  overflow-x:auto;scrollbar-width:none}
+.srcsw::-webkit-scrollbar{display:none}
+.srcsw .lbl{flex:none;font-family:var(--mono);font-size:8.5px;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--tx3);padding-right:4px}
+.srcchip{flex:none;display:flex;align-items:center;gap:7px;height:32px;padding:0 11px 0 6px;
+  border-radius:99px;border:1px solid var(--ln);background:rgba(255,255,255,.03);
+  transition:.16s;white-space:nowrap;color:var(--tx3)}
+.srcchip:hover{border-color:var(--tx3);color:var(--tx)}
+.srcchip img{width:20px;height:20px;border-radius:5px;object-fit:contain;flex:none}
+.srcchip i{width:20px;height:20px;border-radius:5px;flex:none}
+.srcchip .nm{font-size:11.5px;font-weight:700;letter-spacing:-.01em}
+.srcchip .n{font-family:var(--mono);font-size:9px;opacity:.6}
+.srcchip.on{background:rgba(254,238,0,.13);border-color:rgba(254,238,0,.4);color:var(--tx)}
+.srcchip.zero{opacity:.34}
+.srcchip.all{padding-left:12px}
+.srcchip.all .nm{letter-spacing:.1em;font-family:var(--mono);font-size:10px;text-transform:uppercase}
+.jtoggle{flex:none;display:flex;gap:5px}
+.rail{position:absolute;inset:0;display:flex;align-items:stretch;
+  overflow-x:auto;overflow-y:hidden;scroll-behavior:smooth;
+  scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+.rail::-webkit-scrollbar{display:none}
+.rail.grabbing{scroll-behavior:auto;cursor:grabbing}
+.panel{flex:none;width:100%;height:100%;scroll-snap-align:start;overflow:hidden;
+  display:flex;flex-direction:column;background:transparent}
+.pad{padding:20px clamp(22px,3.4vw,52px)}
+@media (max-width:760px){ .pad{padding:14px 16px} }
+
+/* ==================================================================== */
+/*  BOTTOM BAR                                                         */
+/* ==================================================================== */
+.botbar{flex:none;height:var(--bot);border-top:1px solid var(--ln);
+  background:rgba(11,12,16,.78);backdrop-filter:blur(18px);
+  display:flex;align-items:center;gap:12px;padding:0 20px;z-index:20}
+.navbtn{width:32px;height:32px;border-radius:99px;border:1px solid var(--ln);
+  background:rgba(255,255,255,.04);color:var(--tx);display:grid;place-items:center;
+  transition:.15s;flex:none}
+.navbtn:hover{background:var(--y);color:var(--ink);border-color:var(--y)}
+.navbtn[disabled]{opacity:.28;cursor:default}
+.navbtn[disabled]:hover{background:rgba(255,255,255,.04);color:var(--tx);border-color:var(--ln)}
+.posind{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--tx3);
+  flex:none;min-width:60px;text-align:center}
+.botlabel{flex:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--tx3);white-space:nowrap;max-width:34ch;
+  overflow:hidden;text-overflow:ellipsis}
+.botspacer{flex:1}
+.sitemaplink{flex:none;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--tx3);text-decoration:none;border:1px solid var(--ln);
+  border-radius:99px;padding:7px 12px;transition:.15s}
+.sitemaplink:hover{border-color:var(--y);color:var(--y)}
+@media (max-width:900px){ .botlabel{display:none} }
+
+/* focus strip — segmented rail, the only progress in the deck */
+.jstrip{display:flex;align-items:center;gap:6px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+.jstrip::-webkit-scrollbar{display:none}
+.jpill{flex:none;display:flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:99px;
+  border:1px solid var(--ln);font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--tx3);background:rgba(255,255,255,.03);
+  transition:.22s cubic-bezier(.2,.8,.2,1);white-space:nowrap}
+.jpill:hover{color:var(--tx);border-color:var(--tx3)}
+.jpill .e{font-size:11px;line-height:1}
+.jpill .pn{opacity:.7;letter-spacing:.04em}
+.jpill.on{background:rgba(254,238,0,.12);border-color:rgba(254,238,0,.34);color:var(--y);padding-right:12px}
+.jpill .prog{display:none}
+.jpill.on .prog{display:block;width:48px;height:4px;border-radius:99px;
+  background:rgba(255,255,255,.12);position:relative;overflow:hidden}
+.jpill.on .prog i{position:absolute;inset:0 auto 0 0;border-radius:99px;background:var(--y);transition:width .35s ease}
+
+/* ==================================================================== */
+/*  COVER — dark bento                                                 */
+/* ==================================================================== */
+.cover{justify-content:center;position:relative;overflow:hidden}
+.cover-in{padding:0 clamp(26px,5vw,72px);max-width:min(1180px,calc(100% - min(33vw,352px)));
+  position:relative;z-index:2}
+.cover .t-top{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:clamp(18px,3vh,34px)}
+.t-pill{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:#fff;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:99px;
+  padding:7px 14px;backdrop-filter:blur(12px) saturate(1.3);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14)}
+.t-pill .dotmark{width:7px;height:7px;border-radius:99px;background:var(--y)}
+.cover h1{font-family:var(--sans);font-weight:900;font-size:clamp(46px,8.6vw,120px);
+  line-height:.92;letter-spacing:-.04em;color:#fff}
+.cover h1 em{font-style:normal;color:var(--y)}
+.cover .lead{font-size:clamp(15px,1.5vw,21px);line-height:1.5;color:rgba(255,255,255,.82);
+  max-width:74ch;margin-top:clamp(18px,3vh,30px);font-weight:500}
+.cover .sub{font-size:clamp(13px,1.25vw,16.5px);line-height:1.55;margin-top:14px;
+  max-width:78ch;color:var(--tx3)}
+.cover .titlebar{background:var(--y);color:var(--ink);display:inline-block;padding:11px 24px;
+  border-radius:99px;font-weight:800;letter-spacing:.11em;font-size:clamp(11px,1.15vw,15px);
+  margin-top:clamp(18px,2.8vh,32px);text-transform:uppercase;box-shadow:0 14px 34px rgba(0,0,0,.4)}
+.mp-ribbon{position:absolute;right:0;top:0;bottom:0;width:min(33vw,352px);
+  display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(5,1fr);
+  place-items:center;
+  gap:clamp(9px,1.05vw,15px);                 /* one value → equal in both axes */
+  padding:clamp(16px,2.2vw,28px);
+  pointer-events:none;z-index:1}
+/* square, sized off the row height so five rows fill the slide,
+   with max-width as the guard on narrow/short viewports */
+.mp-ribbon i{height:100%;aspect-ratio:1;max-width:100%;max-height:100%}
+.mp-ribbon i{border-radius:14px;border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 20px 40px rgba(0,0,0,.5)}
+@media (max-width:1000px){ .mp-ribbon{display:none} }
+
+/* ==================================================================== */
+/*  SLIDE HEAD                                                         */
+/* ==================================================================== */
+.shead{flex:none;display:flex;align-items:flex-start;gap:14px;padding-bottom:16px}
+.shead .stack{display:flex;flex-direction:column;gap:7px;min-width:0}
+
+.shead h2{font-size:clamp(22px,2.7vw,38px);font-weight:800;letter-spacing:-.035em;line-height:1;color:var(--tx)}
+.shead .tl{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--tx3)}
+.shead .ct{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  color:var(--tx3);white-space:nowrap}
+.seg{display:flex;gap:5px;flex:none}
+.segb{padding:5px 12px;border-radius:99px;font-family:var(--mono);font-size:9.5px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);
+  border:1px solid var(--ln2);transition:.15s}
+.segb:hover{color:var(--tx);border-color:var(--tx3)}
+.segb.on{background:var(--y);border-color:var(--y);color:var(--ink);font-weight:800}
+.dummy-tag{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--soon);background:rgba(255,196,77,.13);
+  padding:4px 9px;border-radius:99px;flex:none}
+
+.st{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;
+  padding:4px 10px;border-radius:99px;white-space:nowrap;font-weight:700;text-transform:uppercase}
+.st.live{background:rgba(87,217,163,.14);color:var(--live)}
+.st.prog{background:rgba(91,200,219,.13);color:var(--part)}
+.st.opp{background:rgba(255,196,77,.13);color:var(--soon)}
+.ilabel{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;
+  padding:4px 10px;border-radius:99px;white-space:nowrap;font-weight:700;text-transform:uppercase}
+.ilabel.gm{background:rgba(255,255,255,.08);color:var(--tbd)}
+.ilabel.cx{background:rgba(91,200,219,.13);color:var(--part)}
+
+
+.lightbox{position:fixed;inset:0;z-index:9000;display:none;place-items:center;
+  background:rgba(6,7,9,.93);backdrop-filter:blur(6px);cursor:zoom-out;padding:34px}
+.lightbox.on{display:grid}
+.lightbox img,.lightbox video{max-width:min(94vw,560px);max-height:92vh;width:auto;height:auto;
+  border-radius:22px;display:block;box-shadow:0 30px 90px rgba(0,0,0,.7);
+  border:1px solid rgba(255,255,255,.12)}
+.lbclose{position:absolute;top:20px;right:24px;width:34px;height:34px;border-radius:50%;
+  border:1px solid var(--ln2);background:rgba(255,255,255,.05);color:var(--tx2);cursor:pointer;
+  display:grid;place-items:center;transition:.15s}
+.lbclose:hover{border-color:var(--y);color:var(--y)}
+.lbcap{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--tx3)}
+
+/* ==================================================================== */
+
+/* ==================================================================== */
+/*  INSIGHTS                                                           */
+/* ==================================================================== */
+.ins{flex:1;min-height:0;overflow:auto;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:13px;align-content:start}
+.icard{background:var(--card);border:1px solid var(--ln);border-radius:18px;padding:20px 18px}
+.icard .n{font-family:var(--mono);font-size:18px;font-weight:800;background:var(--y);
+  color:var(--ink);border-radius:8px;padding:2px 9px;display:inline-block}
+.icard h3{font-size:15.5px;font-weight:800;margin:14px 0 8px;letter-spacing:-.01em;color:var(--tx)}
+.icard p{font-size:12px;line-height:1.55;color:var(--tx3)}
+
+/* ==================================================================== */
+/*  DECK-SPECIFIC — card revamp                                         */
+/* ==================================================================== */
+/* the glow tints per section, same trick as the interop deck */
+.app[data-sec="fresh"] .glow{background:
+  radial-gradient(58% 55% at 85% 10%,rgba(91,141,239,.10),transparent 62%),
+  radial-gradient(45% 50% at 8% 95%,rgba(254,238,0,.05),transparent 55%)}
+.app[data-sec="web"] .glow{background:
+  radial-gradient(58% 55% at 85% 10%,rgba(91,200,219,.10),transparent 62%),
+  radial-gradient(45% 50% at 8% 95%,rgba(254,238,0,.05),transparent 55%)}
+.app[data-sec="functional"] .glow{background:
+  radial-gradient(58% 55% at 85% 10%,rgba(182,120,224,.09),transparent 62%),
+  radial-gradient(45% 50% at 8% 95%,rgba(254,238,0,.05),transparent 55%)}
+.app[data-sec="performance"] .glow{background:
+  radial-gradient(58% 55% at 85% 10%,rgba(87,217,163,.10),transparent 62%),
+  radial-gradient(45% 50% at 8% 95%,rgba(254,238,0,.05),transparent 55%)}
+.app[data-sec="end"] .glow{background:
+  radial-gradient(58% 52% at 50% 50%,rgba(254,238,0,.085),transparent 62%)}
+
+/* every content slide is a head plus one flexible body */
+.col{flex:1;min-height:0;display:flex;flex-direction:column}
+.shead .rt{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+/* ---- empty placeholder, used wherever real content has not landed ---- */
+.ph{border:1.5px dashed var(--ln2);border-radius:16px;background:rgba(255,255,255,.025);
+  display:grid;place-items:center;text-align:center;padding:14px;gap:6px;align-content:center}
+.ph .t{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--tx3)}
+.ph .h{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;color:rgba(244,245,247,.28)}
+
+/* ==================================================================== */
+/*  SCREEN ROW                                                          */
+/* ==================================================================== */
+/* a row of screens is width-limited, so keep the gaps tight and let the row
+   run a little past the slide padding — that buys real pixels per screen */
+.screens{flex:1;min-height:0;display:flex;align-items:stretch;justify-content:center;
+  gap:clamp(8px,1vw,18px);margin-inline:calc(-1 * clamp(8px,1.2vw,22px))}
+/* equal cells keep every screen — and an empty slot waiting on an asset —
+   the same width, so the row reads as one set */
+.screens .shot{flex:1 1 0;min-width:0}
+.screens .fr.empty{justify-self:stretch;width:100%;height:auto;align-self:end}
+@media (max-width:900px){ .screens{overflow-x:auto;justify-content:flex-start} }
+
+/* ==================================================================== */
+/*  BEFORE / AFTER                                                      */
+/* ==================================================================== */
+.ba{flex:1;min-height:0;display:flex;gap:clamp(10px,1.2vw,18px);align-items:stretch}
+@media (max-width:900px){ .ba{overflow-x:auto} }
+.bapair{flex:1;min-width:0;display:flex;flex-direction:column;
+  background:var(--card);border:1px solid var(--ln);border-radius:22px;
+  padding:15px clamp(12px,1.3vw,20px) 14px;transition:.2s}
+.bapair:hover{border-color:var(--ln2);background:var(--card2)}
+.bapair .lbl{display:flex;align-items:baseline;gap:9px;flex:none}
+.bapair .lbl h3{font-size:14.5px;font-weight:800;letter-spacing:-.015em;color:var(--tx)}
+.bapair .lbl span{font-family:var(--mono);font-size:9px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--tx3)}
+.bashots{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
+  gap:clamp(8px,.9vw,14px);margin-top:12px}
+/* a grid row of 1fr hands the frame a definite height, so an empty frame can
+   derive its width from the aspect ratio — a flex column leaves the height
+   indefinite and the frame stretches to the full column instead */
+.shot{height:100%;min-width:0;display:grid;grid-template-rows:minmax(0,1fr) auto;
+  gap:7px;justify-items:center}
+/* The screenshot keeps its own proportions — it is never cropped to a frame
+   shape or stretched to fill one. The border therefore sits on the image
+   itself rather than on the cell, and the cell bottom-aligns it so the
+   caption always sits directly beneath the screen. */
+.shot .fr{height:100%;max-width:100%;display:grid;place-items:end center}
+.shot .fr img,.shot .fr video{max-height:100%;max-width:100%;height:auto;width:auto;
+  display:block;cursor:zoom-in;border-radius:18px;
+  border:1.5px solid rgba(255,255,255,.10)}
+/* only an empty frame needs a shape of its own */
+.shot .fr.empty{width:auto;aspect-ratio:9/19.5;overflow:hidden;place-items:stretch;
+  border-radius:20px;border:1.5px dashed var(--ln2);background:rgba(255,255,255,.03)}
+.shot.web .fr.empty{aspect-ratio:16/10;border-radius:12px}
+.shot .cap{flex:none;font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--tx3)}
+.shot.before .cap{color:var(--tx3)}
+.shot.after .cap{color:var(--y)}
+.shot.after .fr img,.shot.after .fr video{border-color:rgba(254,238,0,.34);
+  box-shadow:0 18px 44px rgba(0,0,0,.45)}
+.shot.after .fr.empty{border-style:solid;border-color:rgba(254,238,0,.34)}
+.baarrow{flex:none;color:var(--tx3);display:grid;place-items:center;opacity:.6}
+.banote{flex:none;margin-top:11px;font-size:11.5px;line-height:1.5;color:var(--tx3)}
+
+/* ==================================================================== */
+/*  SPLIT — a single frame beside a list of points                      */
+/* ==================================================================== */
+.split{flex:1;min-height:0;display:grid;grid-template-columns:1.25fr .85fr;
+  gap:clamp(12px,1.4vw,22px)}
+@media (max-width:1000px){ .split{grid-template-columns:1fr;overflow-y:auto} }
+.splitmedia{min-height:0;display:grid;grid-template-rows:minmax(0,1fr);gap:9px;
+  justify-items:center;background:var(--card);border:1px solid var(--ln);
+  border-radius:22px;padding:16px}
+/* a web screen is width-led — it takes the column and keeps 16:10; a phone
+   screen is height-led, so it takes the slide height and keeps 9:19.5 */
+.splitmedia .fr{max-width:100%;max-height:100%;align-self:center;
+  display:grid;place-items:center}
+.splitmedia .fr img,.splitmedia .fr video{border-radius:12px;
+  border:1.5px solid rgba(255,255,255,.10)}
+.splitmedia .fr.empty{width:100%;height:auto;aspect-ratio:16/10;overflow:hidden;
+  border:1.5px dashed var(--ln2);background:rgba(255,255,255,.03)}
+.splitmedia.phone .fr.empty{width:auto;height:100%;aspect-ratio:9/19.5;border-radius:20px}
+.splitmedia.free .fr{aspect-ratio:auto;width:100%}
+.splitmedia .fr img,.splitmedia .fr video{max-width:100%;max-height:100%;
+  width:auto;height:auto;cursor:zoom-in}
+.splitmedia .cap{font-family:var(--mono);font-size:8.5px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--tx3)}
+.pts{min-height:0;overflow:auto;display:flex;flex-direction:column;gap:10px;align-content:start}
+.pt{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:14px 16px;
+  display:flex;gap:12px;align-items:flex-start}
+.pt .d{flex:none;width:7px;height:7px;border-radius:99px;background:var(--y);margin-top:6px}
+.pt h4{font-size:13.5px;font-weight:800;letter-spacing:-.01em;color:var(--tx);margin:0 0 5px}
+.pt p{font-size:11.5px;line-height:1.55;color:var(--tx3);margin:0}
+
+/* ==================================================================== */
+/*  METRICS                                                             */
+/* ==================================================================== */
+.mwrap{flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(10px,1.2vw,16px)}
+.mgrid{flex:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:clamp(9px,1vw,14px)}
+.mtile{background:var(--card);border:1px solid var(--ln);border-radius:18px;padding:16px 18px}
+.mtile .k{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--tx3)}
+.mtile .v{font-family:var(--mono);font-size:clamp(24px,2.5vw,34px);font-weight:800;
+  letter-spacing:-.04em;line-height:1;margin-top:10px;color:var(--y)}
+.mtile .v.ph-v{color:var(--tx3)}
+.mtile .dl{margin-top:9px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--tx3)}
+.mtile .dl.up{color:var(--live)} .mtile .dl.down{color:var(--coral)}
+.mbox{flex:1;min-height:0;background:var(--card);border:1px solid var(--ln);border-radius:20px;
+  padding:16px 18px;display:flex;flex-direction:column}
+.mbox .bt{flex:none;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--tx2);display:flex;align-items:center;gap:10px}
+.mbox .bt b{margin-left:auto;font-weight:700;color:var(--tx3);letter-spacing:.1em}
+.mbox .body{flex:1;min-height:0;margin-top:12px;display:flex}
+.mbox .body > *{flex:1;min-height:0}
+
+/* ==================================================================== */
+/*  CARD GRID (functional optimisations)                                */
+/* ==================================================================== */
+.cgrid{flex:1;min-height:0;overflow:auto;display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:13px;align-content:start}
+.ccard{background:var(--card);border:1px solid var(--ln);border-radius:18px;padding:18px;
+  transition:.2s;display:flex;flex-direction:column}
+.ccard:hover{border-color:var(--ln2);background:var(--card2)}
+.ccard .n{font-family:var(--mono);font-size:16px;font-weight:800;background:var(--y);
+  color:var(--ink);border-radius:8px;padding:2px 9px;display:inline-block;align-self:flex-start}
+.ccard h3{font-size:15px;font-weight:800;margin:13px 0 8px;letter-spacing:-.015em;color:var(--tx)}
+.ccard p{font-size:11.8px;line-height:1.55;color:var(--tx3)}
+.ccard .foot{margin-top:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* ==================================================================== */
+/*  END                                                                 */
+/* ==================================================================== */
+.endslide{justify-content:center;align-items:center;text-align:center}
+.endslide h2{font-size:clamp(40px,7vw,96px);font-weight:900;letter-spacing:-.045em;
+  line-height:.95;color:#fff}
+.endslide h2 em{font-style:normal;color:var(--y)}
+.endslide p{margin-top:18px;font-size:clamp(13px,1.3vw,17px);color:var(--tx3);max-width:62ch}
+.endslide .ykey{margin-top:26px}
+</style>
+</head>
+<body>
+
+<div class="app" id="app" data-sec="cover">
+  <div class="glow"></div>
+  <div class="grid-tex"></div>
+
+  <div class="stage">
+    <div class="railwrap"><div class="rail" id="rail"></div></div>
+  </div>
+
+  <div class="botbar">
+    <button class="navbtn" id="prev" title="Previous (←)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <span class="posind" id="posind">1 / 1</span>
+    <button class="navbtn" id="next" title="Next (→)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M9 5l7 7-7 7"/></svg></button>
+    <div class="botspacer"></div>
+    <span class="botlabel" id="botlabel"></span>
+    <div class="secdrop" id="secdrop">
+      <button class="secdrop-btn" id="secbtn" aria-haspopup="listbox" aria-expanded="false">
+        <span class="cur" id="seccur">Cover</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <ul class="secdrop-list" id="seclist" role="listbox"></ul>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <button class="lbclose" id="lbclose" title="Close (Esc)">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <div class="lbstage" id="lbstage"></div>
+  <span class="lbcap" id="lbcap"></span>
+</div>
+
+<script>
+/* ====================================================================== */
+/*  CONTENT — everything the deck says lives in this one object.          */
+/*  Content arrives in pieces, so each section is a list of panels and a  */
+/*  panel with no content yet still renders as a labelled placeholder.    */
+/*                                                                        */
+/*  A screen is either  { img:'assets/x.png', cap:'Label' }               */
+/*  or, until the real asset lands,  { cap:'Label' }  → dashed frame.     */
+/* ====================================================================== */
+
+const COVER = {
+  kicker:'noon · consumer product',
+  title:['Digital Card', 'Experience Revamp'],   /* second line takes the yellow */
+  lead:'A rebuilt digital card experience — new look, a real web surface, '
+      +'tighter flows and the performance to back them.',
+  sub:'What changed, why it changed, and what the numbers did after.'
+};
+
+/* Each panel: { sn, title, tagline, tag, layout, ...layout payload }      */
+const PANELS = {
+  fresh: [
+    { title:'Digital Cards Before', tagline:'The experience we started from',
+      layout:'screens',
+      screens:[
+        { img:'assets/before-1.png', cap:'Digital Cards home' },
+        { img:'assets/before-2.png', cap:'Select a card' },
+        { img:'assets/before-3.png', cap:'Card detail' },
+        { img:'assets/before-4.png', cap:'Confirm & pay' },
+        { img:'assets/before-5.png', cap:'Success' }
+      ] },
+
+    { title:'Digital Card Fresh Look', tagline:'The rebuilt experience',
+      layout:'screens',
+      screens:[
+        { img:'assets/after-1.png', cap:'Digital Cards home', after:true },
+        { img:'assets/after-2.png', cap:'Brand & card page', after:true },
+        { img:'assets/after-3.png', cap:'Cart', after:true },
+        { img:'assets/after-4.png', cap:'Order placed', after:true },
+        { cap:'Walkthrough', hint:'video goes here', after:true }
+      ] }
+  ],
+
+  web: [
+    { title:'Web Experience', tagline:'The card journey on web',
+      tag:'Placeholder', layout:'split', device:'web',
+      media:{ cap:'Web screen — placeholder' },
+      points:[
+        { h:'Point one', d:'Placeholder — what the web surface now covers.' },
+        { h:'Point two', d:'Placeholder — how it differs from the app journey.' },
+        { h:'Point three', d:'Placeholder — what it unlocks next.' }
+      ] }
+  ],
+
+  functional: [
+    { title:'Functional Optimisations', tagline:'Flow, logic and content',
+      tag:'Placeholder', layout:'cards',
+      cards:[
+        { t:'Optimisation one',   d:'Placeholder — what changed and why.', foot:'TBD' },
+        { t:'Optimisation two',   d:'Placeholder — what changed and why.', foot:'TBD' },
+        { t:'Optimisation three', d:'Placeholder — what changed and why.', foot:'TBD' },
+        { t:'Optimisation four',  d:'Placeholder — what changed and why.', foot:'TBD' }
+      ] }
+  ],
+
+  performance: [
+    { title:'Performance', tagline:'What moved after launch',
+      tag:'Placeholder', layout:'metrics',
+      metrics:[
+        { k:'Metric one',   v:'—', d:'Placeholder' },
+        { k:'Metric two',   v:'—', d:'Placeholder' },
+        { k:'Metric three', v:'—', d:'Placeholder' },
+        { k:'Metric four',  v:'—', d:'Placeholder' }
+      ],
+      box:{ t:'Trend', note:'Placeholder', cap:'Chart or screenshot goes here' } }
+  ]
+};
+
+const END = {
+  title:['Thank', 'you'],
+  note:'Digital Card Experience Revamp — questions, and what we take on next.'
+};
+
+/* ====================================================================== */
+/*  SECTIONS                                                              */
+/* ====================================================================== */
+const SECTIONS = [
+  { id:'cover',       label:'Cover' },
+  { id:'fresh',       label:'Fresh Look' },
+  { id:'web',         label:'Web Experience' },
+  { id:'functional',  label:'Functional Optimisations' },
+  { id:'performance', label:'Performance' },
+  { id:'end',         label:'End' }
+];
+const SEC_ORDER = SECTIONS.map(s=>s.id);
+const SEC_LABEL = Object.fromEntries(SECTIONS.map(s=>[s.id,s.label]));
+
+/* ====================================================================== */
+/*  RENDERERS                                                             */
+/* ====================================================================== */
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const isVid = src => /\.(mp4|webm|mov)$/i.test(src||'');
+/* a frame with no asset yet needs a shape; one with an asset takes its own */
+const frCls = o => 'fr' + ((o && o.img) ? '' : ' empty');
+
+/* a frame holds the asset once it exists, and says what belongs there
+   until it does */
+function frame(o, hint, showTitle=true){
+  o = o || {};
+  if (!o.img) return `<div class="ph">${showTitle?`<span class="t">${esc(o.cap||'Screen')}</span>`:''}
+      <span class="h">${esc(hint||'drop screenshot here')}</span></div>`;
+  return isVid(o.img)
+    ? `<video src="${o.img}" autoplay loop muted playsinline data-lb="${o.img}" data-cap="${esc(o.cap||'')}"></video>`
+    : `<img src="${o.img}" alt="${esc(o.cap||'')}" data-lb="${o.img}" data-cap="${esc(o.cap||'')}">`;
+}
+
+function shead(p){
+  return `<div class="shead">
+    <div class="stack">
+      <h2>${esc(p.title)}</h2>
+      ${p.tagline ? `<span class="tl">${esc(p.tagline)}</span>` : ''}
+    </div>
+    ${p.tag ? `<span class="rt"><span class="dummy-tag">${esc(p.tag)}</span></span>` : ''}
+  </div>`;
+}
+
+const ARROW = `<span class="baarrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+  stroke="currentColor" stroke-width="2.2"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>`;
+
+function bodyBeforeAfter(p){
+  const dev = p.device === 'web' ? ' web' : '';
+  return `<div class="ba">${p.pairs.map(pr=>`
+    <div class="bapair">
+      <div class="lbl"><h3>${esc(pr.t)}</h3>${pr.s?`<span>${esc(pr.s)}</span>`:''}</div>
+      <div class="bashots">
+        <div class="shot before${dev}"><div class="${frCls(pr.before)}">${frame(pr.before,'before screen',false)}</div>
+          <span class="cap">${esc((pr.before||{}).cap||'Before')}</span></div>
+        ${ARROW}
+        <div class="shot after${dev}"><div class="${frCls(pr.after)}">${frame(pr.after,'after screen',false)}</div>
+          <span class="cap">${esc((pr.after||{}).cap||'After')}</span></div>
+      </div>
+      ${pr.note?`<p class="banote">${esc(pr.note)}</p>`:''}
+    </div>`).join('')}</div>`;
+}
+
+/* a straight row of screens — the slide itself says whether they are the old
+   or the new experience, so nothing is paired */
+function bodyScreens(p){
+  const dev = p.device === 'web' ? ' web' : '';
+  return `<div class="screens">${(p.screens||[]).map(sc=>`
+    <div class="shot${dev}${sc.after?' after':''}">
+      <div class="${frCls(sc)}">${frame(sc, sc.hint||'screen', false)}</div>
+      <span class="cap">${esc(sc.cap||'')}</span>
+    </div>`).join('')}</div>`;
+}
+
+function bodySplit(p){
+  const m = p.media || {};
+  const dev = p.device === 'phone' ? ' phone' : p.device === 'free' ? ' free' : '';
+  return `<div class="split">
+    <div class="splitmedia${dev}">
+      <div class="${frCls(m)}">${frame(m,'screen, flow or recording')}</div>
+      ${m.img && m.cap ? `<span class="cap">${esc(m.cap)}</span>` : ''}
+    </div>
+    <div class="pts vscroll">${(p.points||[]).map(pt=>`
+      <div class="pt"><i class="d"></i><div><h4>${esc(pt.h)}</h4><p>${esc(pt.d)}</p></div></div>`).join('')}
+    </div></div>`;
+}
+
+function bodyCards(p){
+  /* few cards should fill the slide rather than sit in a thin strip at the
+     top, so the column count follows the count and the rows stretch */
+  const n = (p.cards||[]).length;
+  const cols = n<=2 ? Math.max(n,1) : n<=4 ? 2 : n<=6 ? 3 : 4;
+  const fill = n<=8 ? 'grid-auto-rows:minmax(0,1fr);align-content:stretch;' : '';
+  return `<div class="cgrid vscroll" style="grid-template-columns:repeat(${cols},minmax(0,1fr));${fill}">${(p.cards||[]).map((c,i)=>`
+    <div class="ccard">
+      <span class="n">${String(i+1).padStart(2,'0')}</span>
+      <h3>${esc(c.t)}</h3><p>${esc(c.d)}</p>
+      ${c.foot?`<div class="foot"><span class="st opp">${esc(c.foot)}</span></div>`:''}
+    </div>`).join('')}</div>`;
+}
+
+function bodyMetrics(p){
+  const b = p.box;
+  return `<div class="mwrap">
+    <div class="mgrid">${(p.metrics||[]).map(m=>`
+      <div class="mtile"><span class="k">${esc(m.k)}</span>
+        <div class="v${m.v==='—'?' ph-v':''}">${esc(m.v)}</div>
+        ${m.d?`<div class="dl${m.dir==='up'?' up':m.dir==='down'?' down':''}">${esc(m.d)}</div>`:''}
+      </div>`).join('')}</div>
+    ${b ? `<div class="mbox"><div class="bt">${esc(b.t||'Detail')}
+      ${b.note?`<b>${esc(b.note)}</b>`:''}</div>
+      <div class="body">${b.img ? frame(b,'') :
+        `<div class="ph"><span class="t">${esc(b.cap||'Chart')}</span>
+         <span class="h">drop chart or screenshot here</span></div>`}</div></div>` : ''}
+  </div>`;
+}
+
+const BODIES = { screens:bodyScreens, beforeafter:bodyBeforeAfter, split:bodySplit, cards:bodyCards, metrics:bodyMetrics };
+
+function panelOf(p){
+  const body = (BODIES[p.layout] || (()=>`<div class="ph" style="flex:1"><span class="t">Content</span>
+    <span class="h">to be added</span></div>`))(p);
+  return `<div class="panel" data-nm="${esc(p.title)}">
+    <div class="pad col">${shead(p)}${body}</div></div>`;
+}
+
+function panelCover(){
+  return `<div class="panel cover" data-nm="Cover"><div class="cover-in">
+    <div class="t-top"><span class="t-pill"><i class="dotmark"></i>${esc(COVER.kicker)}</span></div>
+    <h1>${esc(COVER.title[0])}<br><em>${esc(COVER.title[1])}</em></h1>
+    <p class="lead">${esc(COVER.lead)}</p>
+    <p class="sub">${esc(COVER.sub)}</p>
+  </div></div>`;
+}
+
+function panelEnd(){
+  return `<div class="panel endslide" data-nm="End">
+    <h2>${esc(END.title[0])} <em>${esc(END.title[1])}</em></h2>
+    <p>${esc(END.note)}</p><span class="ykey"></span></div>`;
+}
+
+/* ====================================================================== */
+/*  SHELL                                                                 */
+/* ====================================================================== */
+const rail = $('#rail');
+const state = { sec:'cover' };
+let panels = [], index = 0;
+
+function render(){
+  let html;
+  if (state.sec === 'cover')    html = panelCover();
+  else if (state.sec === 'end') html = panelEnd();
+  else html = (PANELS[state.sec] || []).map(panelOf).join('')
+             || `<div class="panel"><div class="pad col"><div class="ph" style="flex:1">
+                  <span class="t">${esc(SEC_LABEL[state.sec])}</span>
+                  <span class="h">no content yet</span></div></div></div>`;
+  rail.innerHTML = html;
+  $('#app').dataset.sec = state.sec;
+  syncSecDrop();
+  bindPanel();
+  panels = $$('#rail > .panel');
+  index = 0;
+  rail.scrollTo({ left:0, behavior:'auto' });
+  syncNav();
+}
+
+function bindPanel(){
+  $$('#rail [data-goto]').forEach(b => b.onclick = () => go(b.dataset.goto));
+  $$('#rail [data-lb]').forEach(el => el.onclick = e => {
+    e.stopPropagation(); openLightbox(el.dataset.lb, el.dataset.cap);
+  });
+}
+
+function go(sec){ state.sec = sec; render(); }
+
+function scrollToIndex(i, smooth=true){
+  if (!panels.length) return;
+  i = Math.max(0, Math.min(panels.length-1, i));
+  index = i;
+  rail.scrollTo({ left: panels[i].offsetLeft, behavior: smooth?'smooth':'auto' });
+  syncNav();
+}
+function step(n){
+  const t = index + n, si = SEC_ORDER.indexOf(state.sec);
+  if (t < 0){                                   /* off the front → previous section */
+    if (si > 0){ go(SEC_ORDER[si-1]); scrollToIndex(panels.length-1, false); }
+    return;
+  }
+  if (t > panels.length-1){                     /* off the end → next section */
+    if (si < SEC_ORDER.length-1) go(SEC_ORDER[si+1]);
+    return;
+  }
+  scrollToIndex(t);
+}
+function currentIndex(){
+  if (!panels.length) return 0;
+  const mid = rail.scrollLeft + rail.clientWidth/2;
+  let best = 0, bd = Infinity;
+  panels.forEach((el,i)=>{ const d = Math.abs(el.offsetLeft+el.offsetWidth/2-mid); if (d<bd){ bd=d; best=i; } });
+  return best;
+}
+function syncNav(){
+  const n = panels.length, si = SEC_ORDER.indexOf(state.sec);
+  index = Math.max(0, Math.min(n-1, index));
+  $('#prev').disabled = (index===0 && si===0);
+  $('#next').disabled = (index===n-1 && si===SEC_ORDER.length-1);
+  $('#posind').textContent = n>1 ? `${index+1} / ${n}` : `${si+1} / ${SEC_ORDER.length}`;
+  const cur = panels[index];
+  $('#botlabel').textContent = cur && cur.dataset.nm ? cur.dataset.nm : '';
+}
+
+let scrollTick;
+rail.addEventListener('scroll', ()=>{
+  clearTimeout(scrollTick);
+  scrollTick = setTimeout(()=>{ index = currentIndex(); syncNav(); }, 60);
+});
+
+let wheelLock = 0;
+rail.addEventListener('wheel', e=>{
+  /* a scrollable region owns its own wheel — the deck stays put */
+  if (e.target.closest && e.target.closest('.vscroll')) return;
+  const dd = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+  if (!dd || panels.length < 2) return;
+  e.preventDefault();
+  const now = Date.now();
+  if (now - wheelLock < 420) return;
+  wheelLock = now;
+  const t = index + (dd>0 ? 1 : -1);
+  if (t >= 0 && t <= panels.length-1) scrollToIndex(t);
+}, { passive:false });
+
+let drag = null;
+rail.addEventListener('pointerdown', e=>{
+  if (e.target.closest('.vscroll, button, a, input, select')) return;
+  drag = { x:e.clientX, left:rail.scrollLeft, moved:false };
+  rail.classList.add('grabbing');
+});
+rail.addEventListener('pointermove', e=>{
+  if (!drag) return;
+  const dx = e.clientX - drag.x;
+  if (Math.abs(dx) > 3) drag.moved = true;
+  rail.scrollLeft = drag.left - dx;
+});
+function endDrag(){
+  if (!drag) return;
+  const moved = drag.moved; drag = null;
+  rail.classList.remove('grabbing');
+  if (moved) scrollToIndex(currentIndex());
+}
+['pointerup','pointercancel','pointerleave'].forEach(ev=>rail.addEventListener(ev,endDrag));
+rail.addEventListener('click', e=>{ if (drag && drag.moved) e.preventDefault(); }, true);
+
+document.addEventListener('keydown', e=>{
+  if ($('#lightbox').classList.contains('on')){
+    if (e.key==='Escape' || e.key==='Enter' || e.key===' '){ e.preventDefault(); closeLightbox(); }
+    else if (e.key.startsWith('Arrow')) e.preventDefault();
+    return;
+  }
+  switch(e.key){
+    case 'ArrowRight': case 'ArrowDown': case 'PageDown': e.preventDefault(); step(1); break;
+    case 'ArrowLeft':  case 'ArrowUp':   case 'PageUp':   e.preventDefault(); step(-1); break;
+    case 'Home': e.preventDefault(); go('cover'); break;
+    case 'End':  e.preventDefault(); go('end'); break;
+    case 'Escape': if ($('#secdrop').classList.contains('open')) closeSecDrop(); break;
+  }
+});
+$('#prev').onclick = () => step(-1);
+$('#next').onclick = () => step(1);
+
+/* ---- lightbox ---- */
+function openLightbox(src, caption){
+  $('#lbstage').innerHTML = isVid(src)
+    ? `<video src="${src}" autoplay loop muted playsinline controls></video>`
+    : `<img src="${src}" alt="">`;
+  $('#lbcap').textContent = caption || '';
+  $('#lightbox').classList.add('on');
+}
+function closeLightbox(){
+  $('#lightbox').classList.remove('on');
+  $('#lbstage').innerHTML = '';        /* stops a video that was playing */
+}
+$('#lightbox').onclick = e => { if (!e.target.closest('video')) closeLightbox(); };
+$('#lbclose').onclick = e => { e.stopPropagation(); closeLightbox(); };
+
+/* ---- section dropdown ---- */
+function buildSecDrop(){
+  $('#seclist').innerHTML = SEC_ORDER.map((k,i)=>
+    `<li role="option" data-sec="${k}" aria-selected="${k===state.sec}">
+       <span class="n">${String(i).padStart(2,'0')}</span>${SEC_LABEL[k]}</li>`).join('');
+  $$('#seclist li').forEach(li => li.onclick = () => { closeSecDrop(); go(li.dataset.sec); });
+}
+function openSecDrop(){ $('#secdrop').classList.add('open'); $('#secbtn').setAttribute('aria-expanded','true'); }
+function closeSecDrop(){ $('#secdrop').classList.remove('open'); $('#secbtn').setAttribute('aria-expanded','false'); }
+$('#secbtn').onclick = e => {
+  e.stopPropagation();
+  $('#secdrop').classList.contains('open') ? closeSecDrop() : openSecDrop();
+};
+document.addEventListener('click', e => { if (!e.target.closest('#secdrop')) closeSecDrop(); });
+function syncSecDrop(){
+  const onCover = state.sec === 'cover';
+  $('#secdrop').classList.toggle('hidden', onCover);
+  if (onCover) closeSecDrop();
+  $('#seccur').textContent = SEC_LABEL[state.sec] || state.sec;
+  $$('#seclist li').forEach(li => li.setAttribute('aria-selected', li.dataset.sec===state.sec));
+}
+
+let rz;
+window.addEventListener('resize', ()=>{ clearTimeout(rz); rz = setTimeout(syncNav, 90); });
+window.addEventListener('load', syncNav);
+
+buildSecDrop();
+(function(){
+  const h = (location.hash||'').replace('#','');
+  go(SEC_ORDER.includes(h) ? h : 'cover');
+})();
+</script>
+</body>
+</html>
