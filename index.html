@@ -490,7 +490,10 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .mtile .v{font-family:var(--mono);font-size:clamp(24px,2.5vw,34px);font-weight:800;
   letter-spacing:-.04em;line-height:1;margin-top:10px;color:var(--y)}
 .mtile .v.ph-v{color:rgba(244,245,247,.22)}
-.mtile .dl{margin-top:9px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--tx3)}
+/* the label reads under the number it belongs to */
+.mtile .lab{margin-top:9px;font-family:var(--mono);font-size:9.5px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--tx2)}
+.mtile .dl{margin-top:7px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--tx3)}
 .mtile .dl.up{color:var(--live)} .mtile .dl.down{color:var(--coral)}
 .mbox{flex:1;min-height:0;background:var(--card);border:1px solid var(--ln);border-radius:20px;
   padding:16px 18px;display:flex;flex-direction:column}
@@ -791,13 +794,13 @@ const PANELS = {
       ],
       bands:[
         { from:4,  to:5,  kind:'green', lab:'Assortment +10% → 2x GMV' },
-        { from:12, to:19, kind:'gold' }
+        { from:11, to:19, kind:'gold', lab:'New flow' }
       ],
       metrics:[
-        { k:'Assortment', v:'10%', d:'Relevant & popular assortment like Playstore etc.', dir:'up' },
-        { k:'GMV uplift', v:'2x' },
-        /* this one leads with the number, its label sits underneath */
-        { v:'AED 600K', d:'Monthly GMV baseline · post revamp' }
+        /* each tile leads with its number, its label sits underneath */
+        { v:'10%',      lab:'Assortment increase',  d:'Relevant & popular assortment like Playstore etc.' },
+        { v:'2x',       lab:'GMV uplift',           d:'Post interventions on assortment & discovery.' },
+        { v:'AED 600K', lab:'Monthly GMV baseline', d:'Post revamp' }
       ] }
   ]
 };
@@ -962,6 +965,7 @@ function bodyMetrics(p){
     <div class="mgrid">${(p.metrics||[]).map(m=>`
       <div class="mtile">${m.k?`<span class="k">${esc(m.k)}</span>`:''}
         <div class="v${m.v==='—'?' ph-v':''}">${esc(m.v)}</div>
+        ${m.lab?`<div class="lab">${esc(m.lab)}</div>`:''}
         ${m.d?`<div class="dl${m.dir==='up'?' up':m.dir==='down'?' down':''}">${esc(m.d)}</div>`:''}
       </div>`).join('')}</div>
     ${b ? `<div class="mbox"><div class="bt">${esc(b.t||'Detail')}
@@ -1073,6 +1077,7 @@ function bodyChart(p){
     <div class="mgrid">${(p.metrics||[]).map(m=>`
       <div class="mtile">${m.k?`<span class="k">${esc(m.k)}</span>`:''}
         <div class="v">${esc(m.v)}</div>
+        ${m.lab?`<div class="lab">${esc(m.lab)}</div>`:''}
         ${m.d?`<div class="dl${m.dir==='up'?' up':m.dir==='down'?' down':''}">${esc(m.d)}</div>`:''}
       </div>`).join('')}</div>
   </div>`;
