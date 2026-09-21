@@ -280,7 +280,7 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .lightbox{position:fixed;inset:0;z-index:9000;display:none;place-items:center;
   background:rgba(6,7,9,.93);backdrop-filter:blur(6px);cursor:zoom-out;padding:34px}
 .lightbox.on{display:grid}
-.lightbox img,.lightbox video{max-width:min(94vw,560px);max-height:92vh;width:auto;height:auto;
+.lightbox img,.lightbox video{max-width:min(94vw,1200px);max-height:92vh;width:auto;height:auto;
   border-radius:22px;display:block;box-shadow:0 30px 90px rgba(0,0,0,.7);
   border:1px solid rgba(255,255,255,.12)}
 .lbclose{position:absolute;top:20px;right:24px;width:34px;height:34px;border-radius:50%;
@@ -597,11 +597,11 @@ const PANELS = {
       tag:'Placeholder', layout:'stack',
       /* one slot per point, waiting on its mock */
       items:[
-        { cap:'Mock one' },
-        { cap:'Mock two' },
-        { cap:'Mock three' }
+        { img:'assets/web-old-1.png', cap:'Old · Landing page' },
+        { img:'assets/web-old-2.png', cap:'Old · Brand page' },
+        { img:'assets/web-old-3.png', cap:'Old · Card page' }
       ],
-      hero:{ img:'assets/web-walkthrough.mp4', cap:'Walkthrough' } }
+      hero:{ img:'assets/web-walkthrough.mp4', cap:'New · Walkthrough' } }
   ],
 
   functional: [
