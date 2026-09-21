@@ -142,7 +142,7 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .srcchip.all .nm{letter-spacing:.1em;font-family:var(--mono);font-size:10px;text-transform:uppercase}
 .jtoggle{flex:none;display:flex;gap:5px}
 .rail{position:absolute;inset:0;display:flex;align-items:stretch;
-  overflow-x:auto;overflow-y:hidden;scroll-behavior:smooth;
+  overflow-x:auto;overflow-y:hidden;
   scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
 .rail::-webkit-scrollbar{display:none}
 .rail.grabbing{scroll-behavior:auto;cursor:grabbing}
@@ -203,9 +203,16 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 /* ==================================================================== */
 /*  COVER — dark bento                                                 */
 /* ==================================================================== */
-.cover{justify-content:center;position:relative;overflow:hidden}
-.cover-in{padding:0 clamp(26px,5vw,72px);max-width:min(1180px,calc(100% - min(33vw,352px)));
+/* the cards sit to the right of the title, the text takes what is left */
+.cover{flex-direction:row;align-items:center;justify-content:space-between;
+  gap:clamp(16px,2.6vw,52px);position:relative;overflow:hidden}
+.cover-in{flex:1 1 auto;min-width:0;padding-left:clamp(26px,5vw,72px);
   position:relative;z-index:2}
+.cover-art{flex:none;max-width:min(38%,560px);max-height:84%;width:auto;height:auto;
+  object-fit:contain;margin-right:clamp(12px,2.6vw,48px);
+  filter:drop-shadow(0 30px 60px rgba(0,0,0,.55));position:relative;z-index:2}
+@media (max-width:900px){ .cover-art{display:none}
+  .cover-in{padding-right:clamp(20px,5vw,40px)} }
 .cover .t-top{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:clamp(18px,3vh,34px)}
 .t-pill{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;
   letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:#fff;
@@ -213,7 +220,7 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
   padding:7px 14px;backdrop-filter:blur(12px) saturate(1.3);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.14)}
 .t-pill .dotmark{width:7px;height:7px;border-radius:99px;background:var(--y)}
-.cover h1{font-family:var(--sans);font-weight:900;font-size:clamp(46px,8.6vw,120px);
+.cover h1{font-family:var(--sans);font-weight:900;font-size:clamp(38px,6.2vw,92px);
   line-height:.92;letter-spacing:-.04em;color:#fff}
 .cover h1 em{font-style:normal;color:var(--y)}
 .cover .lead{font-size:clamp(15px,1.5vw,21px);line-height:1.5;color:rgba(255,255,255,.82);
@@ -240,7 +247,7 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 /*  SLIDE HEAD                                                         */
 /* ==================================================================== */
 .shead{flex:none;display:flex;align-items:flex-start;gap:16px;
-  padding-bottom:clamp(15px,2.2vh,24px)}
+  padding-bottom:clamp(12px,1.8vh,20px)}
 /* a thin yellow rule anchors the title block now that the slide numbers
    are gone, and carries the eye down to the subtitle */
 .shead .stack{position:relative;display:flex;flex-direction:column;gap:10px;
@@ -284,7 +291,7 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .lightbox{position:fixed;inset:0;z-index:9000;display:none;place-items:center;
   background:rgba(6,7,9,.93);backdrop-filter:blur(6px);cursor:zoom-out;padding:34px}
 .lightbox.on{display:grid}
-.lightbox img,.lightbox video{max-width:min(94vw,560px);max-height:92vh;width:auto;height:auto;
+.lightbox img,.lightbox video{max-width:min(94vw,1200px);max-height:92vh;width:auto;height:auto;
   border-radius:22px;display:block;box-shadow:0 30px 90px rgba(0,0,0,.7);
   border:1px solid rgba(255,255,255,.12)}
 .lbclose{position:absolute;top:20px;right:24px;width:34px;height:34px;border-radius:50%;
@@ -348,50 +355,93 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 /* equal cells keep every screen — and an empty slot waiting on an asset —
    the same width, so the row reads as one set */
 .screens .shot{flex:1 1 0;min-width:0}
+/* the recording takes all the height the slide has; the stills step down
+   just enough to keep it leading */
+.screens .shot.sm{--scale:.86}
+.screens .shot.vid{--scale:1}
 .screens .fr.empty{justify-self:stretch;width:100%;height:auto;align-self:end}
 @media (max-width:900px){ .screens{overflow-x:auto;justify-content:flex-start} }
 
 /* ==================================================================== */
 /*  BEFORE / AFTER                                                      */
 /* ==================================================================== */
-.ba{flex:1;min-height:0;display:flex;gap:clamp(10px,1.2vw,18px);align-items:stretch}
+.ba{flex:1;min-height:0;display:flex;gap:clamp(12px,1.6vw,30px);align-items:stretch}
 @media (max-width:900px){ .ba{overflow-x:auto} }
-.bapair{flex:1;min-width:0;display:flex;flex-direction:column;
-  background:var(--card);border:1px solid var(--ln);border-radius:22px;
-  padding:15px clamp(12px,1.3vw,20px) 14px;transition:.2s}
-.bapair:hover{border-color:var(--ln2);background:var(--card2)}
-.bapair .lbl{display:flex;align-items:baseline;gap:9px;flex:none}
-.bapair .lbl h3{font-size:14.5px;font-weight:800;letter-spacing:-.015em;color:var(--tx)}
+/* no card and no divider around a pair — the highlight box at the top of
+   each column is what separates the four groups */
+.bapair{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
+/* a wrapping highlight must not sit lower than its neighbours, so every
+   box holds the same height whether its line wraps or not */
+.keybox{order:4;flex:none;display:flex;align-items:center;gap:9px;
+  min-height:clamp(48px,6.4vh,60px);
+  margin-top:11px;padding:10px 13px;border-radius:13px;
+  background:var(--card);border:1px solid var(--ln)}
+.keybox i{flex:none;display:grid;place-items:center;width:18px;height:18px;
+  border-radius:50%;background:var(--y);color:var(--ink);margin-top:1px}
+.keybox span{font-size:clamp(11.5px,.95vw,13.5px);font-weight:600;line-height:1.35;
+  letter-spacing:-.005em;color:var(--tx2)}
+/* the title sits under its pair rather than floating at the top of the
+   slide — screens, their before/after tags, then the moment they show */
+.bapair .lbl{order:3;display:flex;align-items:baseline;gap:9px;flex:none;
+  justify-content:center;margin-top:11px}
+.bapair .lbl h3{font-size:clamp(13px,1.15vw,16.5px);font-weight:800;
+  letter-spacing:-.015em;color:var(--tx)}
 .bapair .lbl span{font-family:var(--mono);font-size:9px;letter-spacing:.14em;
   text-transform:uppercase;color:var(--tx3)}
-.bashots{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
-  gap:clamp(8px,.9vw,14px);margin-top:12px}
-/* a grid row of 1fr hands the frame a definite height, so an empty frame can
-   derive its width from the aspect ratio — a flex column leaves the height
-   indefinite and the frame stretches to the full column instead */
-.shot{height:100%;min-width:0;display:grid;grid-template-rows:minmax(0,1fr) auto;
-  gap:7px;justify-items:center}
-/* The screenshot keeps its own proportions — it is never cropped to a frame
-   shape or stretched to fill one. The border therefore sits on the image
-   itself rather than on the cell, and the cell bottom-aligns it so the
-   caption always sits directly beneath the screen. */
-.shot .fr{height:100%;max-width:100%;display:grid;place-items:end center}
-.shot .fr img,.shot .fr video{max-height:100%;max-width:100%;height:auto;width:auto;
-  display:block;cursor:zoom-in;border-radius:18px;
-  border:1.5px solid rgba(255,255,255,.10)}
-/* only an empty frame needs a shape of its own */
-.shot .fr.empty{width:auto;aspect-ratio:9/19.5;overflow:hidden;place-items:stretch;
-  border-radius:20px;border:1.5px dashed var(--ln2);background:rgba(255,255,255,.03)}
-.shot.web .fr.empty{aspect-ratio:16/10;border-radius:12px}
+.bashots{flex:1 1 auto;min-height:0;display:flex;align-items:stretch;justify-content:center;
+  gap:clamp(6px,.8vw,14px);order:1}
+.bashots .shot{flex:1 1 0;min-width:0}
+.bashots .shot.after{flex-grow:1.3}
+/* the old screen is the reference point, so it sits smaller and quieter
+   than the new one beside it */
+.ba .shot.before{--scale:.78}
+.ba .shot.before .fr{opacity:.45}
+.ba .shot.before .cap{opacity:.55}
+/* CSS alone cannot fit a screen to both the room above it and the room
+   beside it without either cropping it or letterboxing it inside a border,
+   so fitShots() measures each cell and sizes the frame in pixels from the
+   asset's own proportions. --scale is how much of the available height a
+   given screen may take. */
+.shot{--scale:1;height:100%;min-width:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-end;gap:7px}
+/* corner-shape rounds the way a device does — a squircle rather than a
+   plain arc — and a browser without it falls back to the same radius,
+   which fitShots() sets in proportion to how wide the screen is drawn */
+.shot .fr{flex:none;max-width:100%;overflow:hidden;display:grid;place-items:center;
+  corner-shape:squircle;box-shadow:0 18px 44px rgba(0,0,0,.45)}
+.shot .fr img,.shot .fr video{width:100%;height:100%;object-fit:contain;
+  display:block;cursor:zoom-in;corner-shape:squircle}
+/* a frame still waiting on its asset keeps the shape of a phone screen */
+.shot .fr.empty{border:1.5px dashed var(--ln2);
+  background:rgba(255,255,255,.03);box-shadow:none}
 .shot .cap{flex:none;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;color:var(--tx3);text-align:center;line-height:1.3}
 .shot.before .cap{color:var(--tx3)}
 .shot.after .cap{color:var(--y)}
-.shot.after .fr img,.shot.after .fr video{border-color:rgba(254,238,0,.34);
-  box-shadow:0 18px 44px rgba(0,0,0,.45)}
-.shot.after .fr.empty{border-style:solid;border-color:rgba(254,238,0,.34)}
-.baarrow{flex:none;color:var(--tx3);display:grid;place-items:center;opacity:.6}
+.shot.after .fr.empty{border-color:rgba(254,238,0,.34)}
 .banote{flex:none;margin-top:11px;font-size:11.5px;line-height:1.5;color:var(--tx3)}
+
+/* ==================================================================== */
+/*  STACK — small slots down the left, one large screen on the right    */
+/* ==================================================================== */
+.stackrow{flex:1;min-height:0;display:flex;align-items:stretch;
+  gap:clamp(14px,2vw,34px)}
+.flowcol{min-height:0;display:flex;flex-direction:column;gap:9px}
+.flowcol.old{flex:0 0 clamp(170px,16vw,250px)}
+/* the rule is what separates the two flows */
+.flowcol.new{flex:1 1 auto;min-width:0;border-left:1px solid var(--ln);
+  padding-left:clamp(14px,2vw,34px)}
+.flowlbl{flex:none;font-family:var(--mono);font-size:10px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--tx3)}
+.flowlbl.on{color:var(--y)}
+.stackcol{flex:1;min-height:0;min-width:0;display:flex;
+  flex-direction:column;gap:clamp(6px,1.1vh,14px)}
+.stackcol .shot{flex:1 1 0;min-height:0;justify-content:center}
+.flowcol.new .shot.hero{flex:1 1 auto;min-height:0;justify-content:center}
+/* the recording steps back a little from the full height */
+.shot.hero{--scale:.88}
+@media (max-width:900px){ .stackrow{flex-direction:column}
+  .flowcol.new{border-left:0;padding-left:0;border-top:1px solid var(--ln);padding-top:14px} }
 
 /* ==================================================================== */
 /*  SPLIT — a single frame beside a list of points                      */
@@ -406,8 +456,8 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
    screen is height-led, so it takes the slide height and keeps 9:19.5 */
 .splitmedia .fr{max-width:100%;max-height:100%;align-self:center;
   display:grid;place-items:center}
-.splitmedia .fr img,.splitmedia .fr video{border-radius:12px;
-  border:1.5px solid rgba(255,255,255,.10)}
+.splitmedia .fr img,.splitmedia .fr video{border-radius:16px;corner-shape:squircle;
+  box-shadow:0 18px 44px rgba(0,0,0,.45)}
 .splitmedia .fr.empty{width:100%;height:100%;overflow:hidden;border-radius:20px;
   border:1.5px dashed var(--ln2);background:rgba(255,255,255,.03)}
 .splitmedia.phone .fr.empty{width:auto;aspect-ratio:9/19.5}
@@ -508,6 +558,34 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .chfn .row .fl{height:100%;border-radius:99px;background:var(--live);opacity:.85}
 
 /* ==================================================================== */
+/*  COLUMNS — three standing boxes                                      */
+/* ==================================================================== */
+/* the boxes match each other's height and their headings line up, while the
+   row as a whole sits in the middle of the slide rather than filling it */
+.cols{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-auto-rows:minmax(0,min-content);align-content:center;
+  gap:clamp(12px,1.5vw,24px)}
+@media (max-width:900px){ .cols{grid-template-columns:1fr;overflow-y:auto} }
+.colbox{min-height:0;display:flex;flex-direction:column;
+  background:var(--card);border:1px solid var(--ln);border-radius:22px;
+  corner-shape:squircle;padding:clamp(18px,1.9vw,30px) clamp(16px,1.7vw,26px)}
+.colicon{flex:none;display:grid;place-items:center;width:42px;height:42px;
+  border-radius:13px;corner-shape:squircle;
+  background:rgba(254,238,0,.12);color:var(--y);
+  box-shadow:inset 0 0 0 1px rgba(254,238,0,.22)}
+.colbox h3{margin:clamp(14px,1.8vh,20px) 0 clamp(12px,1.6vh,18px);
+  font-size:clamp(15px,1.35vw,20px);font-weight:800;letter-spacing:-.02em;
+  line-height:1.2;color:var(--tx)}
+/* flex:0 1 auto keeps the list from stretching, so centring holds */
+.colpts{flex:0 1 auto;margin:0;padding:0;list-style:none;display:flex;
+  flex-direction:column;gap:clamp(9px,1.3vh,15px);min-height:0;overflow:auto}
+.colpts li{display:flex;gap:11px;align-items:flex-start}
+.colpts li i{flex:none;width:6px;height:6px;border-radius:50%;
+  background:var(--y);margin-top:.5em}
+.colpts li span{font-size:clamp(12px,1.02vw,14.5px);line-height:1.5;
+  color:var(--tx2);letter-spacing:-.003em}
+
+/* ==================================================================== */
 /*  CARD GRID (functional optimisations)                                */
 /* ==================================================================== */
 .cgrid{flex:1;min-height:0;overflow:auto;display:grid;
@@ -601,33 +679,62 @@ const PANELS = {
     { title:'Digital Card Fresh Look', tagline:'The rebuilt experience',
       layout:'screens',
       screens:[
-        { img:'assets/after-1.png', cap:'Digital Cards home', after:true },
-        { img:'assets/after-2.png', cap:'Brand & card page', after:true },
-        { img:'assets/after-3.png', cap:'Cart', after:true },
-        { img:'assets/after-4.png', cap:'Order placed', after:true },
-        { cap:'Walkthrough', hint:'video goes here', after:true }
+        { img:'assets/after-1.png', cap:'Digital Cards home', after:true, small:true },
+        { img:'assets/after-2.png', cap:'Brand & card page', after:true, small:true },
+        { img:'assets/after-3.png', cap:'Cart',              after:true, small:true },
+        { img:'assets/after-4.png', cap:'Order placed',      after:true, small:true },
+        /* the walkthrough closes the row on the right, sized so the whole
+           recording is on screen rather than running past the slide */
+        { img:'assets/walkthrough.mp4', cap:'Walkthrough', after:true, w:1.3, video:true }
+      ] },
+
+    { title:'Old vs New', tagline:'The same four moments, side by side',
+      layout:'beforeafter',
+      pairs:[
+        { t:'Homepage', key:'More Visual Focused Assets',
+          before:{ img:'assets/before-1.png' }, after:{ img:'assets/after-1.png' } },
+        { t:'Product Detail', key:'Instant Delivery Highlight &amp; Reinforcement',
+          before:{ img:'assets/before-3.png' }, after:{ img:'assets/after-2.png' } },
+        { t:'Cart & Checkout', key:'Multi Card Checkout',
+          before:{ img:'assets/before-4.png' }, after:{ img:'assets/after-3.png' } },
+        { t:'Order Confirmation', key:'Clear Redemption Steps',
+          before:{ img:'assets/before-5.png' }, after:{ img:'assets/after-4.png' } }
       ] }
   ],
 
   web: [
     { title:'Web Experience', tagline:'The card journey on web',
-      tag:'Placeholder', layout:'split', device:'web',
-      media:{ cap:'Web screen — placeholder' },
-      points:[
-        { h:'Point one', d:'Placeholder — what the web surface now covers.' },
-        { h:'Point two', d:'Placeholder — how it differs from the app journey.' },
-        { h:'Point three', d:'Placeholder — what it unlocks next.' }
-      ] }
+      tag:'Placeholder', layout:'stack',
+      /* one slot per point, waiting on its mock */
+      oldLabel:'Old Flow', newLabel:'Revamped Flow',
+      items:[
+        { img:'assets/web-old-1.png', cap:'Landing page' },
+        { img:'assets/web-old-2.png', cap:'Brand page' },
+        { img:'assets/web-old-3.png', cap:'Card page' },
+        { img:'assets/web-old-4.png', cap:'Checkout' }
+      ],
+      hero:{ img:'assets/web-walkthrough.mp4', cap:'Walkthrough' } }
   ],
 
   functional: [
-    { title:'Functional Optimisations', tagline:'Flow, logic and content',
-      tag:'Placeholder', layout:'cards',
-      cards:[
-        { t:'Optimisation one',   d:'Placeholder — what changed and why.', foot:'TBD' },
-        { t:'Optimisation two',   d:'Placeholder — what changed and why.', foot:'TBD' },
-        { t:'Optimisation three', d:'Placeholder — what changed and why.', foot:'TBD' },
-        { t:'Optimisation four',  d:'Placeholder — what changed and why.', foot:'TBD' }
+    { title:'What all changed?', layout:'columns',
+      columns:[
+        { icon:'spark', t:'Enhanced user experience', points:[
+          'A fresh new look of both App &amp; Web Experiences.',
+          'Highlighting the visual aspect of the digital cards to have better recall with brand logos.',
+          'Better navigation &amp; grouping of different country &amp; amount variants of the brand cards.',
+          'Multi Card Checkout to have a hassle free journey.',
+          'Better communication through clear order statuses &amp; email comms.'
+        ] },
+        { icon:'grid', t:'Bigger assortment with better discoverability', points:[
+          'We onboarded 2 merchants — LikeCards &amp; JokerCards — to provide the assortment for the digital cards.',
+          'This helped us surface more choices to the user.',
+          'Activated entry-points for relevant search terms to guide users.'
+        ] },
+        { icon:'shield', t:'More security', points:[
+          'Reducing chargebacks by introducing a phone number verification flow.',
+          'Applied tighter checks &amp; alerts for merchants to make sure the service is provided smoothly to users.'
+        ] }
       ] }
   ],
 
@@ -753,18 +860,19 @@ function shead(p){
   </div>`;
 }
 
-const ARROW = `<span class="baarrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-  stroke="currentColor" stroke-width="2.2"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>`;
+const TICK = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+  stroke="currentColor" stroke-width="3.4" stroke-linecap="round"
+  stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg>`;
 
 function bodyBeforeAfter(p){
   const dev = p.device === 'web' ? ' web' : '';
   return `<div class="ba">${p.pairs.map(pr=>`
     <div class="bapair">
       <div class="lbl"><h3>${esc(pr.t)}</h3>${pr.s?`<span>${esc(pr.s)}</span>`:''}</div>
+      ${pr.key ? `<div class="keybox"><i>${TICK}</i><span>${pr.key}</span></div>` : ''}
       <div class="bashots">
         <div class="shot before${dev}"><div class="${frCls(pr.before)}">${frame(pr.before,'before screen',false)}</div>
           <span class="cap">${esc((pr.before||{}).cap||'Before')}</span></div>
-        ${ARROW}
         <div class="shot after${dev}"><div class="${frCls(pr.after)}">${frame(pr.after,'after screen',false)}</div>
           <span class="cap">${esc((pr.after||{}).cap||'After')}</span></div>
       </div>
@@ -777,10 +885,56 @@ function bodyBeforeAfter(p){
 function bodyScreens(p){
   const dev = p.device === 'web' ? ' web' : '';
   return `<div class="screens">${(p.screens||[]).map(sc=>`
-    <div class="shot${dev}${sc.after?' after':''}">
+    <div class="shot${dev}${sc.after?' after':''}${sc.small?' sm':''}${sc.video?' vid':''}" style="flex-grow:${sc.w||1}">
       <div class="${frCls(sc)}">${frame(sc, sc.hint||'screen', false)}</div>
       <span class="cap">${esc(sc.cap||'')}</span>
     </div>`).join('')}</div>`;
+}
+
+/* line icons for the column headers, drawn rather than pulled from a font
+   so the deck stays a single self-contained file */
+const ICONS = {
+  spark:`<path d="M12 3l1.8 4.9L18.7 9.7l-4.9 1.8L12 16.4l-1.8-4.9L5.3 9.7l4.9-1.8L12 3z"/>
+         <path d="M18.5 15.5l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7.7-1.9z"/>`,
+  grid:`<rect x="3.5" y="3.5" width="7" height="7" rx="2"/>
+        <rect x="13.5" y="3.5" width="7" height="7" rx="2"/>
+        <rect x="3.5" y="13.5" width="7" height="7" rx="2"/>
+        <path d="M17 14v6.5M13.7 17.2h6.6"/>`,
+  shield:`<path d="M12 3.2l7 2.8v5.6c0 4.3-2.9 7.3-7 8.9-4.1-1.6-7-4.6-7-8.9V6l7-2.8z"/>
+          <path d="M9 12.1l2.1 2.1L15.3 10"/>`
+};
+const icon = k => `<svg viewBox="0 0 24 24" width="21" height="21" fill="none"
+  stroke="currentColor" stroke-width="1.7" stroke-linecap="round"
+  stroke-linejoin="round">${ICONS[k]||''}</svg>`;
+
+/* three standing boxes, each an icon, a heading and its points */
+function bodyColumns(p){
+  return `<div class="cols">${(p.columns||[]).map(c=>`
+    <div class="colbox">
+      <span class="colicon">${icon(c.icon)}</span>
+      <h3>${c.t}</h3>
+      <ul class="colpts">${(c.points||[]).map(pt=>`
+        <li><i></i><span>${pt}</span></li>`).join('')}</ul>
+    </div>`).join('')}</div>`;
+}
+
+/* a column of smaller slots beside one large screen or recording */
+function bodyStack(p){
+  const shot = (sc, cls) => `
+    <div class="shot web ${cls}">
+      <div class="${frCls(sc)}">${frame(sc, cls === 'hero' ? 'recording' : 'mock', false)}</div>
+      <span class="cap">${esc(sc.cap||'')}</span>
+    </div>`;
+  return `<div class="stackrow">
+    <div class="flowcol old">
+      <span class="flowlbl">${esc(p.oldLabel||'Old')}</span>
+      <div class="stackcol">${(p.items||[]).map(it => shot(it, 'sm')).join('')}</div>
+    </div>
+    <div class="flowcol new">
+      <span class="flowlbl on">${esc(p.newLabel||'New')}</span>
+      ${p.hero ? shot(p.hero, 'hero') : ''}
+    </div>
+  </div>`;
 }
 
 function bodySplit(p){
@@ -931,7 +1085,7 @@ function bodyChart(p){
   </div>`;
 }
 
-const BODIES = { screens:bodyScreens, beforeafter:bodyBeforeAfter, split:bodySplit, cards:bodyCards, metrics:bodyMetrics, chart:bodyChart };
+const BODIES = { screens:bodyScreens, stack:bodyStack, columns:bodyColumns, beforeafter:bodyBeforeAfter, split:bodySplit, cards:bodyCards, metrics:bodyMetrics, chart:bodyChart };
 
 function panelOf(p){
   const body = (BODIES[p.layout] || (()=>`<div class="ph" style="flex:1"><span class="t">Content</span>
@@ -942,12 +1096,15 @@ function panelOf(p){
 }
 
 function panelCover(){
-  return `<div class="panel cover" data-nm="Cover"><div class="cover-in">
+  return `<div class="panel cover" data-nm="Cover">
+    <div class="cover-in">
     <div class="t-top"><span class="t-pill"><i class="dotmark"></i>${esc(COVER.kicker)}</span></div>
     <h1>${esc(COVER.title[0])}<br><em>${esc(COVER.title[1])}</em></h1>
     <p class="lead">${esc(COVER.lead)}</p>
     <p class="sub">${esc(COVER.sub)}</p>
-  </div></div>`;
+    </div>
+    <img class="cover-art" src="assets/cover-cards.png" alt="">
+  </div>`;
 }
 
 function panelEnd(){
@@ -976,6 +1133,8 @@ function render(){
   syncSecDrop();
   bindPanel();
   panels = $$('#rail > .panel');
+  fitShots();
+  requestAnimationFrame(fitShots);      /* again once fonts and layout settle */
   index = 0;
   rail.scrollTo({ left:0, behavior:'auto' });
   syncNav();
@@ -990,17 +1149,79 @@ function bindPanel(){
 
 function go(sec){ state.sec = sec; render(); }
 
-function scrollToIndex(i, smooth=true){
+/* Size every screen to the room its cell actually has. A screen is capped
+   by the height left above its caption and by the width of its column,
+   whichever runs out first, so nothing is ever cut off by the slide edge —
+   and because the frame ends up at the asset's own proportions, the border
+   hugs the screen instead of floating around a letterboxed one. */
+function fitShots(){
+  /* clear what the last pass set, or each run would measure the room the
+     previous run had already shrunk */
+  $$('#rail .bashots').forEach(row => { row.style.height = ''; row.style.flexGrow = ''; });
+  $$('#rail .shot').forEach(shot => {
+    const fr = shot.querySelector('.fr');
+    if (!fr) return;
+    const media = fr.querySelector('img,video');
+    const mw = media ? (media.naturalWidth  || media.videoWidth)  : 0;
+    const mh = media ? (media.naturalHeight || media.videoHeight) : 0;
+    const ar = (mw && mh) ? mw/mh : (shot.classList.contains('web') ? 16/10 : 9/19.5);
+    const cap = shot.querySelector('.cap');
+    const gap = parseFloat(getComputedStyle(shot).rowGap) || 0;
+    const availH = shot.clientHeight - (cap ? cap.offsetHeight + gap : 0);
+    const availW = shot.clientWidth;
+    if (availH <= 0 || availW <= 0) return;
+    const scale = parseFloat(getComputedStyle(shot).getPropertyValue('--scale')) || 1;
+    const h = Math.min(availH * scale, availW / ar);
+    const w = Math.floor(h * ar);
+    fr.style.height = Math.floor(h) + 'px';
+    fr.style.width  = w + 'px';
+    /* a device's corner is a fixed share of its width, so the radius has to
+       follow the size the screen ends up at */
+    const r = Math.round(w * (shot.classList.contains('web') ? .025 : .08)) + 'px';
+    fr.style.borderRadius = r;
+    /* the frame clips its contents, but a video is often composited on its
+       own layer and ignores that clip — so it carries the corner too */
+    if (media) media.style.borderRadius = r;
+  });
+
+  /* a before/after row is as tall as its tallest screen plus its captions,
+     so the pair sits in the middle of the slide instead of at the foot of
+     a row stretched to the full height */
+  $$('#rail .bashots').forEach(row => {
+    const shots = [...row.querySelectorAll('.shot')];
+    if (!shots.length) return;
+    const tall = Math.max(...shots.map(sh => {
+      const fr = sh.querySelector('.fr'), cap = sh.querySelector('.cap');
+      const gap = parseFloat(getComputedStyle(sh).rowGap) || 0;
+      return (fr ? fr.offsetHeight : 0) + (cap ? cap.offsetHeight + gap : 0);
+    }));
+    if (tall > 0){ row.style.height = Math.ceil(tall) + 'px'; row.style.flexGrow = '0'; }
+  });
+}
+
+let fitTick;
+function fitSoon(){ cancelAnimationFrame(fitTick); fitTick = requestAnimationFrame(fitShots); }
+/* an asset reports its size only once it has loaded, so refit on arrival */
+document.addEventListener('load', e => { if (e.target.tagName === 'IMG') fitSoon(); }, true);
+document.addEventListener('loadedmetadata', e => {
+  if (e.target.tagName !== 'VIDEO') return;
+  fitSoon();
+  e.target.play().catch(()=>{});      /* autoplay is refused in a background tab */
+}, true);
+
+/* slides cut straight across — no tween, no animation on arrival */
+function scrollToIndex(i){
   if (!panels.length) return;
   i = Math.max(0, Math.min(panels.length-1, i));
   index = i;
-  rail.scrollTo({ left: panels[i].offsetLeft, behavior: smooth?'smooth':'auto' });
+  rail.scrollTo({ left: panels[i].offsetLeft, behavior:'auto' });
   syncNav();
 }
+
 function step(n){
   const t = index + n, si = SEC_ORDER.indexOf(state.sec);
   if (t < 0){                                   /* off the front → previous section */
-    if (si > 0){ go(SEC_ORDER[si-1]); scrollToIndex(panels.length-1, false); }
+    if (si > 0){ go(SEC_ORDER[si-1]); scrollToIndex(panels.length-1); }
     return;
   }
   if (t > panels.length-1){                     /* off the end → next section */
@@ -1122,8 +1343,9 @@ function syncSecDrop(){
 }
 
 let rz;
-window.addEventListener('resize', ()=>{ clearTimeout(rz); rz = setTimeout(syncNav, 90); });
-window.addEventListener('load', syncNav);
+window.addEventListener('resize', ()=>{ clearTimeout(rz); rz = setTimeout(()=>{ fitShots(); syncNav(); }, 90); });
+window.addEventListener('load', ()=>{ fitShots(); syncNav(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitShots);
 
 buildSecDrop();
 (function(){

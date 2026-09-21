@@ -35,7 +35,9 @@ slides as it needs. A slide picks a `layout`:
 | `screens` | a row of screens at their own proportions | `screens: [{ img, cap }]` |
 | `beforeafter` | before → after pairs | `pairs: [{ t, before, after }]` |
 | `split` | one large screen beside a list of points | `media`, `points` |
+| `stack` | small slots down the left, one large screen right | `items`, `hero` |
 | `cards` | a numbered grid of cards | `cards: [{ t, d }]` |
+| `columns` | three standing boxes, icon + heading + points | `columns: [{ icon, t, points }]` |
 | `metrics` | metric tiles over a chart area | `metrics`, `box` |
 | `chart` | a monthly bar chart above metric tiles | `series`, `bands`, `marks`, `legend`, `metrics` |
 
