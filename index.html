@@ -230,11 +230,21 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 /* ==================================================================== */
 /*  SLIDE HEAD                                                         */
 /* ==================================================================== */
-.shead{flex:none;display:flex;align-items:flex-start;gap:14px;padding-bottom:16px}
-.shead .stack{display:flex;flex-direction:column;gap:7px;min-width:0}
+.shead{flex:none;display:flex;align-items:flex-start;gap:16px;
+  padding-bottom:clamp(15px,2.2vh,24px)}
+/* a thin yellow rule anchors the title block now that the slide numbers
+   are gone, and carries the eye down to the subtitle */
+.shead .stack{position:relative;display:flex;flex-direction:column;gap:10px;
+  min-width:0;padding-left:clamp(13px,1.1vw,18px)}
+.shead .stack::before{content:"";position:absolute;left:0;top:3px;bottom:3px;
+  width:3px;border-radius:99px;background:var(--y)}
 
-.shead h2{font-size:clamp(22px,2.7vw,38px);font-weight:800;letter-spacing:-.035em;line-height:1;color:var(--tx)}
-.shead .tl{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--tx3)}
+.shead h2{font-size:clamp(23px,2.8vw,40px);font-weight:800;letter-spacing:-.035em;
+  line-height:1;color:var(--tx)}
+/* the subtitle is a sentence, not a label — it reads as sans text rather than
+   the mono the deck uses for chips and captions */
+.shead .tl{font-family:var(--sans);font-size:clamp(13.5px,1.25vw,18px);font-weight:500;
+  letter-spacing:-.005em;line-height:1.35;color:rgba(244,245,247,.60);max-width:74ch}
 .shead .ct{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
   color:var(--tx3);white-space:nowrap}
 .seg{display:flex;gap:5px;flex:none}
@@ -360,8 +370,8 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .shot .fr.empty{width:auto;aspect-ratio:9/19.5;overflow:hidden;place-items:stretch;
   border-radius:20px;border:1.5px dashed var(--ln2);background:rgba(255,255,255,.03)}
 .shot.web .fr.empty{aspect-ratio:16/10;border-radius:12px}
-.shot .cap{flex:none;font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--tx3)}
+.shot .cap{flex:none;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--tx3);text-align:center;line-height:1.3}
 .shot.before .cap{color:var(--tx3)}
 .shot.after .cap{color:var(--y)}
 .shot.after .fr img,.shot.after .fr video{border-color:rgba(254,238,0,.34);
@@ -385,9 +395,11 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
   display:grid;place-items:center}
 .splitmedia .fr img,.splitmedia .fr video{border-radius:12px;
   border:1.5px solid rgba(255,255,255,.10)}
-.splitmedia .fr.empty{width:100%;height:auto;aspect-ratio:16/10;overflow:hidden;
+.splitmedia .fr.empty{width:100%;height:100%;overflow:hidden;border-radius:20px;
   border:1.5px dashed var(--ln2);background:rgba(255,255,255,.03)}
-.splitmedia.phone .fr.empty{width:auto;height:100%;aspect-ratio:9/19.5;border-radius:20px}
+.splitmedia.phone .fr.empty{width:auto;aspect-ratio:9/19.5}
+/* while it is still a placeholder the card frame around it is redundant */
+.splitmedia:has(.fr.empty){border:0;background:none;padding:0}
 .splitmedia.free .fr{aspect-ratio:auto;width:100%}
 .splitmedia .fr img,.splitmedia .fr video{max-width:100%;max-height:100%;
   width:auto;height:auto;cursor:zoom-in}
@@ -411,7 +423,7 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
   text-transform:uppercase;color:var(--tx3)}
 .mtile .v{font-family:var(--mono);font-size:clamp(24px,2.5vw,34px);font-weight:800;
   letter-spacing:-.04em;line-height:1;margin-top:10px;color:var(--y)}
-.mtile .v.ph-v{color:var(--tx3)}
+.mtile .v.ph-v{color:rgba(244,245,247,.22)}
 .mtile .dl{margin-top:9px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--tx3)}
 .mtile .dl.up{color:var(--live)} .mtile .dl.down{color:var(--coral)}
 .mbox{flex:1;min-height:0;background:var(--card);border:1px solid var(--ln);border-radius:20px;
@@ -434,7 +446,7 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
   color:var(--ink);border-radius:8px;padding:2px 9px;display:inline-block;align-self:flex-start}
 .ccard h3{font-size:15px;font-weight:800;margin:13px 0 8px;letter-spacing:-.015em;color:var(--tx)}
 .ccard p{font-size:11.8px;line-height:1.55;color:var(--tx3)}
-.ccard .foot{margin-top:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ccard .foot{margin-top:auto;padding-top:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 
 /* ==================================================================== */
 /*  END                                                                 */
