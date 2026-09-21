@@ -30,7 +30,9 @@ Open `index.html` in any browser.
 | `index.html` + `assets/` | every image inside the page, the two recordings beside it | ~11MB + 36MB |
 | `index-standalone.html` | the whole deck in one file, recordings included | ~59MB |
 
-Upload either to any static host — there is nothing to build or serve.
+Both are committed under `deploy/`, so they can be pulled and hosted
+without running the build. Upload either to any static host — there is
+nothing to build or serve.
 Images are re-encoded to JPEG and the recordings to a lighter preset for
 the web; the originals in `assets/` stay untouched as the masters.
 
