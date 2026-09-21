@@ -790,11 +790,11 @@ const PANELS = {
         { from:5, to:19, v:608.4, lab:'608K' }
       ],
       bands:[
-        { from:4,  to:5,  kind:'green', lab:'Assortment ~2x → uplift' },
+        { from:4,  to:5,  kind:'green', lab:'Assortment +10% → 2x GMV' },
         { from:17, to:19, kind:'gold',  lab:'New flow — no uplift' }
       ],
       legend:[
-        { kind:'green', lab:"May–Jun'25 · assortment nearly doubled" },
+        { kind:'green', lab:"May–Jun'25 · assortment up 10%, GMV 2x" },
         { kind:'gold',  lab:"Jun'26 · App-wide rollout, no uplift" }
       ],
       funnel:{ t:'A/B lift · test vs control', rows:[
@@ -804,8 +804,8 @@ const PANELS = {
         { k:'Brands / order',v:0 }
       ] },
       metrics:[
-        { k:'Baseline shift',   v:'2.0x',  d:"Jan–May'25 301K → Jun'25 onward 608K, on ~2x assortment", dir:'up' },
-        { k:'A/B test GMV lift',v:'+23%',  d:'AE & SA · 50/50 split, App only', dir:'up' },
+        { k:'Assortment', v:'10%', d:'Relevant & popular assortment like Playstore etc.', dir:'up' },
+        { k:'GMV uplift', v:'2x',  d:'Relevant & popular assortment like Playstore etc.', dir:'up' },
         { k:'Rollout reached',  v:'100%',  d:"All App users since mid-Jun'26", dir:'up' },
         { k:'Since rollout',    v:'AED 594K', d:"Apr–Aug'26 avg vs 664K prior six months", dir:'down' }
       ] }
