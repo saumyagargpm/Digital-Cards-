@@ -775,7 +775,7 @@ const PANELS = {
     /* post-2025 is a step change, not a slope — two run-rate lines make the
        shift legible, and the funnel says which product change caused it */
     { kicker:'Phase 2 · Post-2025', title:'Growth and the Revamp', tagline:'A new baseline, then the buying-flow rollout',
-      layout:'chart', unit:'AED · monthly GMV',
+      layout:'chart',
       series:[
         { m:'Jan 25', v:328.1 }, { m:'Feb 25', v:270.9 }, { m:'Mar 25', v:334.0 },
         { m:'Apr 25', v:254.0 }, { m:'May 25', v:316.2 }, { m:'Jun 25', v:546.0 },
@@ -793,10 +793,6 @@ const PANELS = {
         { from:4,  to:5,  kind:'green', lab:'Assortment +10% → 2x GMV' },
         { from:17, to:19, kind:'gold',  lab:'New flow — no uplift' }
       ],
-      legend:[
-        { kind:'green', lab:"May–Jun'25 · assortment up 10%, GMV 2x" },
-        { kind:'gold',  lab:"Jun'26 · App-wide rollout, no uplift" }
-      ],
       funnel:{ t:'A/B lift · test vs control', rows:[
         { k:'GMV',          v:23 }, { k:'Add to cart',   v:14 },
         { k:'AOV',          v:13 }, { k:'Orders',        v:8  },
@@ -805,9 +801,9 @@ const PANELS = {
       ] },
       metrics:[
         { k:'Assortment', v:'10%', d:'Relevant & popular assortment like Playstore etc.', dir:'up' },
-        { k:'GMV uplift', v:'2x',  d:'Relevant & popular assortment like Playstore etc.', dir:'up' },
-        { k:'Rollout reached',  v:'100%',  d:"All App users since mid-Jun'26", dir:'up' },
-        { k:'Since rollout',    v:'AED 594K', d:"Apr–Aug'26 avg vs 664K prior six months", dir:'down' }
+        { k:'GMV uplift', v:'2x' },
+        /* this one leads with the number, its label sits underneath */
+        { v:'AED 600K', d:'Monthly GMV baseline · post revamp' }
       ] }
   ]
 };
@@ -970,7 +966,7 @@ function bodyMetrics(p){
   const b = p.box;
   return `<div class="mwrap">
     <div class="mgrid">${(p.metrics||[]).map(m=>`
-      <div class="mtile"><span class="k">${esc(m.k)}</span>
+      <div class="mtile">${m.k?`<span class="k">${esc(m.k)}</span>`:''}
         <div class="v${m.v==='—'?' ph-v':''}">${esc(m.v)}</div>
         ${m.d?`<div class="dl${m.dir==='up'?' up':m.dir==='down'?' down':''}">${esc(m.d)}</div>`:''}
       </div>`).join('')}</div>
@@ -1072,15 +1068,15 @@ function bodyChart(p){
         <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
           ${bands}${axis}${bars}${bases}${notes}${line}${xlabs}
         </svg>
-        <div class="chcap">
+        ${(p.legend&&p.legend.length)||p.unit ? `<div class="chcap">
           ${(p.legend||[]).map(l=>`<span class="${l.kind}"><i></i>${esc(l.lab)}</span>`).join('')}
           ${p.unit?`<span style="margin-left:auto">${esc(p.unit)}</span>`:''}
-        </div>
+        </div>` : ''}
       </div>
       ${funnel}
     </div>
     <div class="mgrid">${(p.metrics||[]).map(m=>`
-      <div class="mtile"><span class="k">${esc(m.k)}</span>
+      <div class="mtile">${m.k?`<span class="k">${esc(m.k)}</span>`:''}
         <div class="v">${esc(m.v)}</div>
         ${m.d?`<div class="dl${m.dir==='up'?' up':m.dir==='down'?' down':''}">${esc(m.d)}</div>`:''}
       </div>`).join('')}</div>
