@@ -18,7 +18,7 @@ Open `index.html` in any browser.
 2. **Fresh Look** — *Digital Cards Before* and *Digital Card Fresh Look*
 3. **Web Experience**
 4. **Functional Optimisations**
-5. **Performance** — *Digital Cards GMV* and *Performance*
+5. **Performance** — *Digital Cards GMV*, *Chargeback Rate* and *Performance*
 6. **End**
 
 ## Editing the content
@@ -45,7 +45,8 @@ saying who still owes the slide its content.
 For `chart`, `series` is `[{ m:'Nov 23', v:1422.6 }]` with `v` in thousands;
 add `pre:true` to grey a bar out. `bands` shades a range by series index
 (`{ from, to, kind:'red'|'green', lab }`) and `marks` labels one bar
-(`{ at, lab }`).
+(`{ at, lab }`). Set `fmt:'pct'` for a percentage axis, and give a point a
+`tone` of `hot`, `warm` or `good` to colour that bar.
 
 ### Adding a screenshot
 
