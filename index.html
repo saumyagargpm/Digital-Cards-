@@ -147,9 +147,18 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
 .rail::-webkit-scrollbar{display:none}
 .rail.grabbing{scroll-behavior:auto;cursor:grabbing}
 .panel{flex:none;width:100%;height:100%;scroll-snap-align:start;overflow:hidden;
-  display:flex;flex-direction:column;background:transparent}
+  display:flex;flex-direction:column;background:transparent;position:relative}
 .pad{padding:20px clamp(22px,3.4vw,52px)}
 @media (max-width:760px){ .pad{padding:14px 16px} }
+
+/* ---- a note pinned over a slide: who still owes it content ---- */
+.sticky{position:absolute;right:clamp(22px,3.4vw,52px);bottom:18px;z-index:20;
+  width:188px;padding:13px 14px;background:var(--y);color:var(--ink);
+  border-radius:2px;transform:rotate(-2.2deg);transform-origin:100% 100%;
+  box-shadow:0 14px 30px rgba(0,0,0,.5);font-family:var(--mono);font-size:11px;
+  line-height:1.45;letter-spacing:.01em}
+.sticky b{display:block;font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+  opacity:.55;margin-bottom:5px}
 
 /* ==================================================================== */
 /*  BOTTOM BAR                                                         */
@@ -560,7 +569,7 @@ const PANELS = {
 
   performance: [
     { title:'Performance', tagline:'What moved after launch',
-      tag:'Placeholder', layout:'metrics',
+      tag:'Placeholder', layout:'metrics', sticky:'Amit will update',
       metrics:[
         { k:'Metric one',   v:'—', d:'Placeholder' },
         { k:'Metric two',   v:'—', d:'Placeholder' },
@@ -700,7 +709,8 @@ function panelOf(p){
   const body = (BODIES[p.layout] || (()=>`<div class="ph" style="flex:1"><span class="t">Content</span>
     <span class="h">to be added</span></div>`))(p);
   return `<div class="panel" data-nm="${esc(p.title)}">
-    <div class="pad col">${shead(p)}${body}</div></div>`;
+    <div class="pad col">${shead(p)}${body}</div>
+    ${p.sticky ? `<div class="sticky"><b>Note</b>${esc(p.sticky)}</div>` : ''}</div>`;
 }
 
 function panelCover(){
