@@ -677,11 +677,11 @@ const PANELS = {
     { title:'Digital Cards Before', tagline:'The experience we started from',
       layout:'screens',
       screens:[
-        { img:'assets/before-1.png', cap:'Digital Cards home' },
-        { img:'assets/before-2.png', cap:'Select a card' },
-        { img:'assets/before-3.png', cap:'Card detail' },
-        { img:'assets/before-4.png', cap:'Confirm & pay' },
-        { img:'assets/before-5.png', cap:'Success' }
+        { img:'assets/before-1.png', cap:'Digital Cards home', sc:.74 },
+        { img:'assets/before-2.png', cap:'Select a card', sc:.74 },
+        { img:'assets/before-3.png', cap:'Card detail', sc:.74 },
+        { img:'assets/before-4.png', cap:'Confirm & pay', sc:.74 },
+        { img:'assets/before-5.png', cap:'Success', sc:.74 }
       ] },
 
     { title:'Digital Card Fresh Look', tagline:'The rebuilt experience',
@@ -882,7 +882,8 @@ function bodyBeforeAfter(p){
 function bodyScreens(p){
   const dev = p.device === 'web' ? ' web' : '';
   return `<div class="screens">${(p.screens||[]).map(sc=>`
-    <div class="shot${dev}${sc.after?' after':''}${sc.small?' sm':''}${sc.video?' vid':''}" style="flex-grow:${sc.w||1}">
+    <div class="shot${dev}${sc.after?' after':''}${sc.small?' sm':''}${sc.video?' vid':''}"
+      style="flex-grow:${sc.w||1}${sc.sc?`;--scale:${sc.sc}`:''}">
       <div class="${frCls(sc)}">${frame(sc, sc.hint||'screen', false)}</div>
       <span class="cap">${esc(sc.cap||'')}</span>
     </div>`).join('')}</div>`;
