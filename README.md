@@ -18,7 +18,7 @@ Open `index.html` in any browser.
 2. **Fresh Look** — *Digital Cards Before* and *Digital Card Fresh Look*
 3. **Web Experience**
 4. **Functional Optimisations**
-5. **Performance** — *Digital Cards GMV*, *Chargeback Rate* and *Performance*
+5. **Performance** — *Pre-2025 · Fraud Cleanup* and *Post-2025 · Growth and the Revamp*
 6. **End**
 
 ## Editing the content
@@ -47,6 +47,15 @@ add `pre:true` to grey a bar out. `bands` shades a range by series index
 (`{ from, to, kind:'red'|'green', lab }`) and `marks` labels one bar
 (`{ at, lab }`). Set `fmt:'pct'` for a percentage axis, and give a point a
 `tone` of `hot`, `warm` or `good` to colour that bar.
+
+A `chart` can carry three more things when one slide has to make a whole
+argument:
+
+| Field | What it adds |
+| --- | --- |
+| `line` + `lineMax` | a second series on a right-hand percentage axis, one value per month, `null` where there is no reading |
+| `baselines` | a dashed run-rate drawn across the months it covers — `{ from, to, v, lab }` |
+| `funnel` | a panel of uplift bars beside the chart — `{ t, rows:[{ k, v }] }`, `v:0` renders as *flat* |
 
 ### Adding a screenshot
 

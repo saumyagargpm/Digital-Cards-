@@ -470,6 +470,35 @@ input{color:var(--tx)} input::placeholder{color:var(--tx3)}
   vertical-align:-1px}
 .chcap .red i{background:rgba(242,118,107,.45);outline:1px solid rgba(242,118,107,.6)}
 .chcap .green i{background:rgba(87,217,163,.45);outline:1px solid rgba(87,217,163,.6)}
+.chcap .line i{background:none;border-top:2px solid var(--coral);height:0;border-radius:0}
+
+/* ---- a second series on its own right-hand axis ---- */
+.chplot .ln{fill:none;stroke:var(--coral);stroke-width:2.2;stroke-linejoin:round}
+.chplot .lndot{fill:var(--coral)}
+.chplot .ylab.r{text-anchor:start;fill:rgba(242,118,107,.75)}
+
+/* ---- a run-rate reference drawn across the months it covers ---- */
+.chplot .base{stroke:var(--y);stroke-width:1.6;stroke-dasharray:5 4;opacity:.75}
+/* the label sits over its own bars, so it carries a dark outline to stay read */
+.chplot .baselab{font-family:var(--mono);font-size:9.5px;font-weight:700;fill:var(--y);
+  text-anchor:start;paint-order:stroke;stroke:var(--bg);stroke-width:3.5;stroke-linejoin:round}
+
+/* ---- chart beside a funnel, when one slide has to carry both ---- */
+.chrow{flex:1;min-height:0;display:flex;gap:clamp(10px,1.2vw,16px)}
+.chrow .chplot{flex:1;min-width:0}
+.chfn{flex:none;width:clamp(200px,25%,290px);background:var(--card);border:1px solid var(--ln);
+  border-radius:20px;padding:15px 18px;display:flex;flex-direction:column}
+.chfn .bt{flex:none;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--tx2)}
+.chfn .rows{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:9px;
+  margin-top:12px}
+.chfn .row{display:grid;grid-template-columns:1fr;gap:4px}
+.chfn .row .lb{display:flex;align-items:baseline;gap:8px;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.06em;color:var(--tx2)}
+.chfn .row .lb b{margin-left:auto;font-size:11px;color:var(--live)}
+.chfn .row.flat .lb b{color:var(--tx3)}
+.chfn .row .tr{height:7px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+.chfn .row .fl{height:100%;border-radius:99px;background:var(--live);opacity:.85}
 
 /* ==================================================================== */
 /*  CARD GRID (functional optimisations)                                */
@@ -596,71 +625,69 @@ const PANELS = {
   ],
 
   performance: [
-    /* pre:true = the fraud-inflated months, greyed so the clean base reads clearly */
-    { title:'Digital Cards GMV', tagline:'Nov 2023 – Aug 2026 · three phases',
-      layout:'chart', unit:'AED · monthly GMV',
+    /* the whole pre-2025 argument is that the GMV and the chargeback rate are
+       the same story, so they share one plot: bars on the left axis, rate on
+       the right. The bars are greyed because that GMV was never really ours. */
+    { title:'Pre-2025 · Fraud Cleanup', tagline:'The GMV and the risk behind it were the same curve',
+      layout:'chart', unit:'Bars: AED monthly GMV · Line: chargebacks, % of GMV',
       series:[
         { m:'Nov 23', v:1422.6, pre:true }, { m:'Dec 23', v:741.4,  pre:true },
         { m:'Jan 24', v:2625.4, pre:true }, { m:'Feb 24', v:4226.9, pre:true },
         { m:'Mar 24', v:4448.1, pre:true }, { m:'Apr 24', v:2884.9, pre:true },
         { m:'May 24', v:2517.9, pre:true }, { m:'Jun 24', v:1438.7, pre:true },
         { m:'Jul 24', v:186.6,  pre:true }, { m:'Aug 24', v:49.8,   pre:true },
-        { m:'Sep 24', v:252.8 }, { m:'Oct 24', v:405.5 }, { m:'Nov 24', v:432.7 },
-        { m:'Dec 24', v:352.3 }, { m:'Jan 25', v:328.1 }, { m:'Feb 25', v:270.9 },
-        { m:'Mar 25', v:334.0 }, { m:'Apr 25', v:254.0 }, { m:'May 25', v:316.2 },
-        { m:'Jun 25', v:546.0 }, { m:'Jul 25', v:573.3 }, { m:'Aug 25', v:550.3 },
-        { m:'Sep 25', v:502.2 }, { m:'Oct 25', v:621.6 }, { m:'Nov 25', v:638.3 },
-        { m:'Dec 25', v:735.5 }, { m:'Jan 26', v:687.8 }, { m:'Feb 26', v:572.1 },
-        { m:'Mar 26', v:728.8 }, { m:'Apr 26', v:597.4 }, { m:'May 26', v:711.9 },
-        { m:'Jun 26', v:634.5 }, { m:'Jul 26', v:479.2 }, { m:'Aug 26', v:547.1 }
+        { m:'Sep 24', v:252.8 }, { m:'Oct 24', v:405.5 },
+        { m:'Nov 24', v:432.7 }, { m:'Dec 24', v:352.3 }
       ],
-      bands:[
-        { from:8,  to:9,  kind:'red',   lab:'Fraud filtering tightened' },
-        { from:31, to:33, kind:'green', lab:'New flow at 100%' }
-      ],
+      /* read off the chart in the status update; null where it stops reporting */
+      line:[17.4, 12.9, 15.6, 17.8, 14.3, 14.2, 23.9, 9.6, 1.3, 0.0, 0.3, 0.0, null, null],
+      lineMax:25,
+      bands:[ { from:8, to:9, kind:'red', lab:'Filtering tightened, fraud users removed' } ],
       marks:[ { at:4, lab:'AED 4.45M — fraud-inflated peak' } ],
       legend:[
-        { kind:'red',   lab:'Jul–Aug 24 · fraud cleanup' },
-        { kind:'green', lab:'Jun 26 · buying-flow revamp at 100% of App' }
+        { kind:'red',  lab:"Jul–Aug'24 · cleanup" },
+        { kind:'line', lab:'Chargeback rate' }
       ],
       metrics:[
-        { k:'Chargebacks at peak', v:'23.9%', d:'May 24 share of GMV → ~0 after cleanup', dir:'down' },
-        { k:'Organic growth',      v:'2.9x',  d:"Sep'24 → Mar'26 · AED 0.25M → 0.73M", dir:'up' },
-        { k:'A/B test GMV lift',   v:'+23%',  d:'Test vs control · AE & SA, 50/50 split', dir:'up' },
-        { k:'Since App-wide launch', v:'AED 594K', d:"Apr–Aug'26 avg vs 664K prior 6 mo", dir:'down' }
+        { k:'Peak chargeback rate', v:'23.9%',    d:"May'24 · 15.7% average over the eight bad months", dir:'down' },
+        { k:'Fraud-inflated peak',  v:'AED 4.45M',d:"Mar'24 · not a base we could hold", dir:'down' },
+        { k:'After the cleanup',    v:'~0%',      d:"Aug'24 onward · risk back to baseline", dir:'up' },
+        { k:'Clean base to build on', v:'AED 253K', d:"Sep'24 · where the real business restarts", dir:'up' }
       ] },
 
-    /* tone bands the bar by how bad the month was, so the cleanup reads at a glance */
-    { title:'Chargeback Rate', tagline:'Fraud filtering brought risk back down',
-      layout:'chart', fmt:'pct', unit:'Chargebacks as % of GMV',
+    /* post-2025 is a step change, not a slope — two run-rate lines make the
+       shift legible, and the funnel says which product change caused it */
+    { title:'Post-2025 · Growth and the Revamp', tagline:'A new baseline, then the buying-flow rollout',
+      layout:'chart', unit:'AED · monthly GMV',
       series:[
-        { m:"Sep'23", v:1.9,  tone:'good' }, { m:"Oct'23", v:3.0,  tone:'good' },
-        { m:"Nov'23", v:17.4, tone:'hot'  }, { m:"Dec'23", v:12.9, tone:'warm' },
-        { m:"Jan'24", v:15.6, tone:'hot'  }, { m:"Feb'24", v:17.8, tone:'hot'  },
-        { m:"Mar'24", v:14.3, tone:'warm' }, { m:"Apr'24", v:14.2, tone:'warm' },
-        { m:"May'24", v:23.9, tone:'hot'  }, { m:"Jun'24", v:9.6,  tone:'warm' },
-        { m:"Jul'24", v:1.3,  tone:'good' }, { m:"Aug'24", v:0.0,  tone:'good' },
-        { m:"Sep'24", v:0.3,  tone:'good' }, { m:"Oct'24", v:0.0,  tone:'good' }
+        { m:'Jan 25', v:328.1 }, { m:'Feb 25', v:270.9 }, { m:'Mar 25', v:334.0 },
+        { m:'Apr 25', v:254.0 }, { m:'May 25', v:316.2 }, { m:'Jun 25', v:546.0 },
+        { m:'Jul 25', v:573.3 }, { m:'Aug 25', v:550.3 }, { m:'Sep 25', v:502.2 },
+        { m:'Oct 25', v:621.6 }, { m:'Nov 25', v:638.3 }, { m:'Dec 25', v:735.5 },
+        { m:'Jan 26', v:687.8 }, { m:'Feb 26', v:572.1 }, { m:'Mar 26', v:728.8 },
+        { m:'Apr 26', v:597.4 }, { m:'May 26', v:711.9 }, { m:'Jun 26', v:634.5 },
+        { m:'Jul 26', v:479.2 }, { m:'Aug 26', v:547.1 }
       ],
-      bands:[ { from:11, to:13, kind:'green', lab:'Effectively zero' } ],
-      marks:[ { at:8, lab:'23.9% peak' } ],
-      legend:[ { kind:'green', lab:"Aug'24 onward · risk back to baseline" } ],
-      metrics:[
-        { k:'Peak chargeback rate', v:'23.9%', d:"May'24, share of GMV", dir:'down' },
-        { k:'Average while elevated', v:'15.7%', d:"Nov'23 – Jun'24, eight months", dir:'down' },
-        { k:'After the cleanup', v:'~0.1%', d:"Aug–Oct'24 average", dir:'up' },
-        { k:'Time to clean up', v:'2 mo', d:"Jul–Aug'24 filtering and user removal", dir:'up' }
+      baselines:[
+        { from:0, to:4,  v:300.6, lab:'301K' },
+        { from:5, to:19, v:608.4, lab:'608K' }
+      ],
+      bands:[ { from:17, to:19, kind:'green', lab:'New flow at 100% of App' } ],
+      legend:[
+        { kind:'green', lab:"Jun'26 · App-wide rollout" }
+      ],
+      funnel:{ t:'A/B lift · test vs control', rows:[
+        { k:'GMV',          v:23 }, { k:'Add to cart',   v:14 },
+        { k:'AOV',          v:13 }, { k:'Orders',        v:8  },
+        { k:'Cards / order',v:6  }, { k:'Units sold',    v:3  },
+        { k:'Brands / order',v:0 }
       ] },
-
-    { title:'Performance', tagline:'What moved after launch',
-      tag:'Placeholder', layout:'metrics', sticky:'Amit will update',
       metrics:[
-        { k:'Metric one',   v:'—', d:'Placeholder' },
-        { k:'Metric two',   v:'—', d:'Placeholder' },
-        { k:'Metric three', v:'—', d:'Placeholder' },
-        { k:'Metric four',  v:'—', d:'Placeholder' }
-      ],
-      box:{ t:'Trend', note:'Placeholder', cap:'Chart or screenshot goes here' } }
+        { k:'Baseline shift',   v:'2.0x',  d:"Jan–May'25 301K → Jun'25 onward 608K", dir:'up' },
+        { k:'A/B test GMV lift',v:'+23%',  d:'AE & SA · 50/50 split, App only', dir:'up' },
+        { k:'Rollout reached',  v:'100%',  d:"All App users since mid-Jun'26", dir:'up' },
+        { k:'Since rollout',    v:'AED 594K', d:"Apr–Aug'26 avg vs 664K prior six months", dir:'down' }
+      ] }
   ]
 };
 
@@ -791,7 +818,8 @@ function bodyMetrics(p){
    top — the chart is the argument, the tiles underneath are the receipts */
 function bodyChart(p){
   const s = p.series || [], n = s.length;
-  const W = 1000, H = 300, L = 46, R = 8, T = 18, B = 26;   /* viewBox + margins */
+  /* a second series needs its own axis, so the right margin opens up for it */
+  const W = 1000, H = 300, L = 46, R = p.line ? 42 : 8, T = 18, B = 26;
   const pw = W - L - R, ph = H - T - B;
   const max = Math.max(...s.map(d=>d.v)) * 1.08;
   const step = pw / n, bw = Math.max(3, step * 0.62);
@@ -805,8 +833,9 @@ function bodyChart(p){
   /* round the axis to a nice step, so the gridlines read as numbers not pixels */
   const NICE = [.5,1,2,5,10,25,50,100,250,500,1000,2500];
   const tick = NICE.find(t => max / t <= 6) || 5000;
+  /* thousands stay in K — rounding 250 to "0.3M" would misstate the axis */
   const ylab = v => pct ? v + '%'
-    : v ? (v/1000).toFixed(v % 1000 ? 1 : 0) + 'M' : '0';
+    : !v ? '0' : v < 1000 ? v + 'K' : (v/1000).toFixed(v % 1000 ? 1 : 0) + 'M';
   let axis = '';
   for (let v = 0; v <= max; v += tick){
     axis += `<line class="grid${v?'':' zero'}" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/>
@@ -831,15 +860,56 @@ function bodyChart(p){
   const notes = (p.marks||[]).map(mk=>
     `<text class="peak" x="${x(mk.at)+bw/2}" y="${y(s[mk.at].v)-7}">${esc(mk.lab)}</text>`).join('');
 
+  /* a run rate is a claim about a stretch of months, so draw it across
+     exactly those months rather than the whole plot */
+  const bases = (p.baselines||[]).map(b=>{
+    const x1 = L + step * b.from, x2 = L + step * (b.to + 1), yv = y(b.v);
+    return `<line class="base" x1="${x1+2}" x2="${x2-2}" y1="${yv}" y2="${yv}"/>
+      <text class="baselab" x="${x1+5}" y="${yv-6}">${esc(b.lab)}</text>`;
+  }).join('');
+
+  /* the second series rides a right-hand axis of its own — gaps where a month
+     has no reading, so the line never implies data that isn't there */
+  let line = '';
+  if (p.line){
+    const lmax = p.lineMax || Math.max(...p.line.filter(v=>v!=null)) * 1.15;
+    const yl = v => T + ph - (v / lmax) * ph;
+    const runs = []; let cur = [];
+    p.line.forEach((v,i)=>{
+      if (v == null){ if (cur.length) runs.push(cur); cur = []; return; }
+      cur.push(`${x(i)+bw/2},${yl(v)}`);
+    });
+    if (cur.length) runs.push(cur);
+    line = runs.map(r=>`<polyline class="ln" points="${r.join(' ')}"/>`).join('')
+      + p.line.map((v,i)=> v == null ? '' :
+          `<circle class="lndot" cx="${x(i)+bw/2}" cy="${yl(v)}" r="2.6"><title>${esc(s[i].m)} — ${v}%</title></circle>`).join('');
+    const ltick = NICE.find(t => lmax / t <= 5) || 10;
+    for (let v = 0; v <= lmax; v += ltick)
+      line += `<text class="ylab r" x="${W-R+9}" y="${yl(v)+3}">${v}%</text>`;
+  }
+
+  const funnel = p.funnel ? `<div class="chfn">
+    <div class="bt">${esc(p.funnel.t || 'Uplift')}</div>
+    <div class="rows">${p.funnel.rows.map(r=>{
+      const top = Math.max(...p.funnel.rows.map(q=>q.v));
+      return `<div class="row${r.v?'':' flat'}">
+        <div class="lb">${esc(r.k)}<b>${r.v?'+'+r.v+'%':'flat'}</b></div>
+        <div class="tr"><div class="fl" style="width:${top?Math.max(r.v/top*100,1.5):1.5}%"></div></div>
+      </div>`;
+    }).join('')}</div></div>` : '';
+
   return `<div class="chwrap">
-    <div class="chplot">
-      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
-        ${bands}${axis}${bars}${notes}${xlabs}
-      </svg>
-      <div class="chcap">
-        ${(p.legend||[]).map(l=>`<span class="${l.kind}"><i></i>${esc(l.lab)}</span>`).join('')}
-        ${p.unit?`<span style="margin-left:auto">${esc(p.unit)}</span>`:''}
+    <div class="chrow">
+      <div class="chplot">
+        <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+          ${bands}${axis}${bars}${bases}${notes}${line}${xlabs}
+        </svg>
+        <div class="chcap">
+          ${(p.legend||[]).map(l=>`<span class="${l.kind}"><i></i>${esc(l.lab)}</span>`).join('')}
+          ${p.unit?`<span style="margin-left:auto">${esc(p.unit)}</span>`:''}
+        </div>
       </div>
+      ${funnel}
     </div>
     <div class="mgrid">${(p.metrics||[]).map(m=>`
       <div class="mtile"><span class="k">${esc(m.k)}</span>
